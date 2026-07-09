@@ -22,6 +22,11 @@ SITE_DIR = Path(__file__).parent / "site"
 @task
 def setup(c: Context) -> None:
     """Check environment variables and create .env if needed."""
+    try:
+        c.run("chmod +x captain-hooks/*.sh")
+    except invoke.exceptions.AuthFailure:
+        print("Execute 'sudo ls' before executing this command!")
+
     check_env("PROJECT", default="meadows-docs", comment="Project name")
     check_env("NAME_SERVICE", default="meadows", comment="Name of the service")
     check_env("HOSTINGDOMAIN", default="meadows.chat", comment="Hosting domain")
