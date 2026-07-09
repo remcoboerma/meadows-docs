@@ -1,0 +1,12 @@
+.git
+.env
+*.env
+__pycache__
+*.pyc
+*.pyo
+*.bak
+.cache
+.secret
+site/
+*.md
+!docs/**/*.md

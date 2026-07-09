@@ -1,0 +1,56 @@
+networks:
+  broker:
+    name: broker
+    external: true
+
+services:
+  builder:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.builder
+    restart: "no"
+    volumes:
+      - ./site:/build/site
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  mkdocs:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: unless-stopped
+    volumes:
+      - ./docs:/docs
+    ports:
+      - "8000:8000"
+    stdin_open: true
+    tty: true
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  server:
+    build:
+      context: .
+      dockerfile: ./Dockerfile.server
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${NAME_SERVICE}-${PROJECT}-secure.rule=Host(`${HOSTINGDOMAIN}`)"
+      - "traefik.http.routers.${NAME_SERVICE}-${PROJECT}-secure.tls=true"
+      - "traefik.http.routers.${NAME_SERVICE}-${PROJECT}-secure.entrypoints=web-secured"
+      - "traefik.http.routers.${NAME_SERVICE}-${PROJECT}-secure.tls.certresolver=letsencrypt"
+      - "traefik.docker.network=broker"
+    networks:
+      - broker
+      - default
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"

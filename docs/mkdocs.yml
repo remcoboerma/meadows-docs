@@ -1,0 +1,123 @@
+site_name: MEADOWS Documentation
+site_url: "https://meadows.chat"
+site_author: MEADOWS Contributors
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  language: en
+  features:
+    - navigation.instant
+    - navigation.instant.preview
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.top
+    - navigation.tabs
+    - toc.integrate
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - navigation.sections
+    - search.suggest
+    - search.highlight
+  icon:
+    repo: fontawesome/brands/github
+  logo: images/logo.svg
+  favicon: images/favicon.svg
+
+repo_name: meadows
+repo_url: https://github.com/meadows-chat/meadows
+
+plugins:
+  - search
+  - tags
+
+  - group:
+      enabled: !ENV CI
+      plugins:
+        - git-revision-date-localized
+        - git-committers
+
+  - group:
+      enabled: !ENV INSIDERS
+      plugins:
+        - privacy
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - footnotes
+  - attr_list
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.betterem
+  - pymdownx.tilde
+  - pymdownx.critic
+  - pymdownx.keys
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.snippets:
+      base_path:
+        - docs/protocol
+        - docs/server
+        - docs/client
+        - docs/bot
+        - docs/web
+        - docs/tui
+  - tables
+  - def_list
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/meadows-chat/meadows
+  generator: false
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Quickstart: getting-started.md
+      - Installation: installation.md
+  - Architecture:
+      - Overview: architecture/overview.md
+      - Dependency Graph: architecture/dependency-graph.md
+      - Protocol Boundary: architecture/protocol-boundary.md
+      - Design Principles: architecture/design-principles.md
+  - Packages:
+      - protocol/index.md
+      - server/index.md
+      - client/index.md
+      - bot/index.md
+      - web/index.md
+      - tui/index.md
+  - Reference:
+      - Configuration: reference/configuration.md
+      - Environment Variables: reference/environment-variables.md
+      - CLI Commands: reference/cli-commands.md
+      - Socket.IO API: reference/socketio-api.md
+      - Webhook API: reference/webhook-api.md
+  - Development:
+      - Contributing: development/contributing.md
+      - Testing: development/testing.md
+      - Docker: development/docker.md

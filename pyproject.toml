@@ -1,0 +1,28 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "meadows-docs"
+version = "0.1.0"
+description = "MEADOWS documentation site (MkDocs Material)"
+requires-python = ">=3.12"
+dependencies = [
+    "edwh>=0.63",
+    "invoke>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = []
+
+[tool.ruff]
+line-length = 120
+select = ["F", "E", "W", "Q", "A", "SIM", "ARG", "PTH", "RUF", "C90", "N", "YTT"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

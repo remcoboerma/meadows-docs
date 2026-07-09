@@ -1,0 +1,26 @@
+FROM educationwarehouse/edwhale-3.13:latest AS builder
+
+RUN apt install git
+RUN uvenv install --no-cache mkdocs
+RUN uvenv inject --no-cache mkdocs mkdocs-material
+RUN uvenv inject --no-cache mkdocs cairosvg pillow
+RUN uvenv inject --no-cache mkdocs mkdocs-git-revision-date-localized-plugin
+RUN uvenv inject --no-cache mkdocs mkdocs-git-committers-plugin-2
+
+WORKDIR /docs
+COPY docs/ /docs/
+
+RUN /root/.local/bin/mkdocs build -d /build/site
+
+FROM educationwarehouse/edwhale-3.13:latest
+
+RUN uvenv install --no-cache gunicorn
+
+WORKDIR /app
+
+COPY app.py /app/
+COPY --from=builder /build/site /build/site
+
+EXPOSE 8000
+
+CMD ["/root/.local/bin/gunicorn", "--bind", "0.0.0.0:8000", "--workers", "2", "app:application"]
