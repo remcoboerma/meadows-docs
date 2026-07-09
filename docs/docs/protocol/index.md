@@ -8,6 +8,8 @@ description: Pure declarations for the MEADOWS protocol
 > Pure declaration of the MEADOWS protocol: envelope, event names, JWT claims, permissions, labels.
 > **No behavior.**
 
+**Repository:** [github.com/remcoboerma/meadows-protocol](https://github.com/remcoboerma/meadows-protocol)
+
 ## Overview
 
 `meadows-protocol` is the foundation package. Every other package depends on it. It contains only Pydantic models, enums, and constants — zero behavior, zero I/O.

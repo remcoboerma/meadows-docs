@@ -9,6 +9,8 @@ description: Terminal UI client
 > Uses click for CLI argument parsing and Textual for the terminal interface.
 > Connects directly to meadows-server via Socket.IO using meadows-client.
 
+**Repository:** [github.com/remcoboerma/meadows-tui](https://github.com/remcoboerma/meadows-tui)
+
 ## Overview
 
 `meadows-tui` provides a terminal-based chat interface for MEADOWS. It's a full-featured client with:

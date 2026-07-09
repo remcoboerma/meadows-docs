@@ -8,6 +8,8 @@ description: Dumb HTTP host for the web UI
 > MEADOWS web host: a dumb HTTP host that serves `index.html` and static assets.
 > No Socket.IO, no auth, no domain logic. The browser is the client; the Socket.IO connection runs browser→meadows-server, NOT via this Python webserver.
 
+**Repository:** [github.com/remcoboerma/meadows-web](https://github.com/remcoboerma/meadows-web)
+
 ## Overview
 
 `meadows-web` is the simplest package. It:

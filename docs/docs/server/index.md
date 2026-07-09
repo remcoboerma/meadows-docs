@@ -7,6 +7,8 @@ description: The MEADOWS coordination hub
 
 > MEADOWS coordination hub: the server-as-object. Socket.IO AsyncServer with an ASGI wrapper, an object-oriented Hub (no module globals), and a single chokepoint emit that validates frames against `meadows.protocol` before they hit the wire.
 
+**Repository:** [github.com/remcoboerma/meadows-server](https://github.com/remcoboerma/meadows-server)
+
 ## Overview
 
 The server is the heart of MEADOWS. It handles:

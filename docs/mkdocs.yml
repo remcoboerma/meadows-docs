@@ -38,8 +38,8 @@ theme:
   logo: images/logo.svg
   favicon: images/favicon.svg
 
-repo_name: meadows
-repo_url: https://github.com/meadows-chat/meadows
+repo_name: meadows-docs
+repo_url: https://github.com/remcoboerma/meadows-docs
 
 plugins:
   - search
@@ -91,7 +91,7 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/meadows-chat/meadows
+      link: https://github.com/remcoboerma
   generator: false
 
 nav:

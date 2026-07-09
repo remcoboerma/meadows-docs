@@ -8,6 +8,8 @@ description: Client-side Socket.IO transport
 > Client-side Socket.IO transport for MEADOWS: connect, reconnect, JWT handshake.
 > No domain logic — shared by `meadows-bot` and future non-browser clients.
 
+**Repository:** [github.com/remcoboerma/meadows-client](https://github.com/remcoboerma/meadows-client)
+
 ## Overview
 
 `meadows-client` wraps `python-socketio.AsyncClient` with MEADOWS-specific concerns:

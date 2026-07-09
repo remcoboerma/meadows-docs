@@ -8,6 +8,8 @@ description: Bot SDK for MEADOWS
 > MEADOWS bot SDK: `BaseBot`, `LLMBot`, and ready-to-use bots. Bot-author-facing package with a fast quick-start.
 > Depends on `meadows-client` (transport) and `meadows-protocol` (shapes). Never imports from `meadows-server`.
 
+**Repository:** [github.com/remcoboerma/meadows-bot](https://github.com/remcoboerma/meadows-bot)
+
 ## Overview
 
 The bot package is what bot authors interact with. The whole contract is: `BOT_NAME` + `should_handle` + `handle` + `connect()`.

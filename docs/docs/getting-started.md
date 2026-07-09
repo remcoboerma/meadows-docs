@@ -18,8 +18,8 @@ Get MEADOWS running in under 5 minutes.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/meadows-chat/meadows.git
-cd meadows
+git clone https://github.com/remcoboerma/meadows-server.git
+cd meadows-server
 ```
 
 ### 2. Set up the server
