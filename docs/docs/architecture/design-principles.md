@@ -15,9 +15,9 @@ MEADOWS avoids Matrix' Byzantine-federation complexity by assuming a trusted ser
 
 The server distributes messages without claiming room ownership. Makes federation trivial later; prevents room-namespace conflicts now.
 
-## 3. Structural guarantee over convention
+## 3. Structural guarantee over convention (intended)
 
-Labeling lambdas are JSON Logic rules (boolean predicates), not Python-sandboxed functions. Statelessness is structurally enforced (JSON Logic cannot have state), not trusted via sandbox isolation.
+The design intention is that labeling lambdas will be JSON Logic rules (boolean predicates), not Python-sandboxed functions. JSON Logic cannot have state, which would make statelessness structurally enforced rather than trusted via sandbox isolation. **This is not yet implemented** — `labels.py` currently provides only the `(origin, label, semver)` triplet as a `NamedTuple`.
 
 ## 4. Mechanism is protocol, vocabulary is domain
 

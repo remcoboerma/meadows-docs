@@ -50,7 +50,7 @@ Before adding anything to `meadows-protocol`, ask: **does the server need this f
 
 ### Labels
 
-**Protocol** owns the JSON Logic predicate mechanism and the `(origin, name, version)` tuple shape.
+**Protocol** owns the label triplet mechanism `(origin, label, semver)` and the `Label` NamedTuple shape. The intended direction is JSON Logic predicates for labeling lambdas (see design principles), but this is not yet implemented.
 
 **Domain** owns which schemas exist and what they're called.
 
