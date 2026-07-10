@@ -186,6 +186,13 @@ Labels are stored as separate JSONL records alongside messages:
 {"event":"label_assigned","labels":[{"origin":"bot-sentiment","label":"sentiment","semver":"1.0.0","metadata":{"score":-1.0,"tone":"angry"}}],"target_msg_id":"1783...","applied_by":"bot-sentiment"}
 ```
 
+RPC requests and responses are both persisted to the same group's JSONL file. The response's `group_id` matches the request's `group_id` — service bots propagate it from the incoming request. This keeps the full RPC conversation in one place:
+
+```
+{"type":"rpc_request","content":"add 2 3","labels":[["bot-math-svc","service:math","1.0.0",{"request_id":"req-001"}]],...}
+{"type":"rpc_response","content":"5","labels":[["bot-math-svc","service:math-response","1.0.0",{"request_id":"req-001"}]],...}
+```
+
 The server never merges `MESSAGE` and `LABEL_ASSIGNED` records — they are distinct. `FETCH_MESSAGES` returns both.
 
 Auto-room-labels are **not** persisted. The room is already in the filename.
@@ -332,6 +339,146 @@ Listener output:
 [INFO] [listener] RECEIVED LABEL_ASSIGNED: 1 labels for msg 1783...
 [INFO] [listener] ANGER ALERT on msg 1783...: score=-1.0, tone=angry
 ```
+
+### echo_service_bot — a minimal RPC service
+
+This bot offers an echo service via RPC. It subscribes to its service label and responds to requests:
+
+```python
+class EchoServiceBot(BaseBot):
+    BOT_NAME = "echo-svc"
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.client.on(EventName.MESSAGE, self._on_rpc_request)
+
+    def _on_rpc_request(self, data):
+        if data.get("type") != MessageType.RPC_REQUEST.value:
+            return
+        # Extract request_id from label metadata
+        request_id = None
+        for lbl in data.get("labels", []):
+            if len(lbl) > 3 and isinstance(lbl[3], dict):
+                request_id = lbl[3].get("request_id")
+                if request_id:
+                    break
+        # Echo back with same request_id, persisted to the same group
+        self.emit_rpc_response(
+            request_id=request_id,
+            content=f"Echo: {data['content']}",
+            origin="bot-echo-svc",
+            service_label="service:echo-response",
+            group_id=data.get("group_id", "general"),
+        )
+
+if __name__ == "__main__":
+    bot = EchoServiceBot()
+    bot.register_label_subscription(
+        "echo-service",
+        {"and": [
+            {"regex_match": [{"var": "label"}, "^service:echo$"]},
+            {"semver_match": [">=1.0.0", {"var": "semver"}]},
+        ]},
+        scope="global",
+        deliver="message_only",
+    )
+    bot.connect()
+```
+
+### rpc_caller_bot — calling RPC services
+
+This bot calls the echo and math services and displays results:
+
+```python
+class RPCCallerBot(BaseBot):
+    BOT_NAME = "caller"
+
+    def handle(self, command, args, raw_args, message, thread_context):
+        if command == "echo":
+            text = self.extract_quoted_string(args)
+            # emit_rpc_request returns a request_id for correlation
+            request_id = self.emit_rpc_request(
+                service_label="service:echo",
+                content=text,
+                origin="bot-echo-svc",
+            )
+            return None  # Response arrives asynchronously
+
+    def _on_rpc_response(self, data):
+        if data.get("type") != MessageType.RPC_RESPONSE.value:
+            return
+        # Extract request_id for correlation
+        for lbl in data.get("labels", []):
+            if len(lbl) > 3 and isinstance(lbl[3], dict):
+                request_id = lbl[3].get("request_id")
+                self.log(f"Response (req={request_id}): {data['content']}")
+```
+
+### Running the RPC example
+
+```bash
+# Terminal 1 — server
+cd meadows-server && uv run python -m meadows.server
+
+# Terminal 2 — echo service
+cd meadows-bot && MEADOWS_SERVER_URL=http://localhost:8080 \
+  MEADOWS_JWT_TOKEN=<echo-svc-token> uv run python -m meadows.bot.examples.echo_service_bot
+
+# Terminal 3 — math service
+cd meadows-bot && MEADOWS_SERVER_URL=http://localhost:8080 \
+  MEADOWS_JWT_TOKEN=<math-svc-token> uv run python -m meadows.bot.examples.math_service_bot
+
+# Terminal 4 — caller bot
+cd meadows-bot && MEADOWS_SERVER_URL=http://localhost:8080 \
+  MEADOWS_JWT_TOKEN=<caller-token> uv run python -m meadows.bot.examples.rpc_caller_bot
+
+# In the caller's chat:
+@caller echo hello world
+@caller math add 2 3
+@caller math power 2 10
+```
+
+Caller output:
+
+```
+[INFO] [caller] Sent echo request a1b2c3: hello world
+[INFO] [caller] RPC response (req=a1b2c3): Echo: hello world
+[INFO] [caller] Sent math request d4e5f6: add 2 3
+[INFO] [caller] RPC response (req=d4e5f6): 5
+[INFO] [caller] Sent math request g7h8i9: power 2 10
+[INFO] [caller] RPC response (req=g7h8i9): 1024
+```
+
+### Testing RPC via webhook
+
+You don't need the caller bot to test RPC. Any HTTP client can send RPC requests via the webhook endpoint. The webhook passes through the `type` and `labels` from the request body:
+
+```bash
+# Generate tokens (after server restart)
+cd meadows-server
+CALLER_TOKEN=$(uv run edwh local.bot-jwt --name=caller 2>/dev/null | tail -1)
+
+# Echo RPC
+curl -X POST http://127.0.0.1:8080/r/test \
+  -H "Authorization: Bearer $CALLER_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"content":"hello","type":"rpc_request","labels":[["bot-echo-svc","service:echo","1.0.0",{"request_id":"req-001"}]]}'
+
+# Math RPC
+curl -X POST http://127.0.0.1:8080/r/test \
+  -H "Authorization: Bearer $CALLER_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"content":"add 2 3","type":"rpc_request","labels":[["bot-math-svc","service:math","1.0.0",{"request_id":"req-002"}]]}'
+```
+
+Both request and response are persisted to `test.jsonl`. The response includes the same `request_id` in its label metadata for correlation.
+
+```bash
+# Verify persistence
+grep "rpc_response" meadows-server/messages/test.jsonl
+```
+
+The webhook is the HTTP equivalent of a Socket.IO `MESSAGE` event. The `type` field defaults to `"webhook"` but is overridden to `rpc_request` or `rpc_response` when specified. Labels are passed through to the label-routing pipeline.
 
 ## Design intent
 
