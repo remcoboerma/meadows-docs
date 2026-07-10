@@ -517,7 +517,37 @@ The webhook is the HTTP equivalent of a Socket.IO `MESSAGE` event. The `type` fi
 
 MEADOWS had a routing problem. Pattern matching (regex on content) is flat — every bot gets what the regex finds, without context, without shared taxonomy. The stats bot registers `".*"` and sees everything. A bot that wants only urgent messages must write its own regex and hope nobody else defines "urgent" differently.
 
-Labels solve this by making annotations first-class routing objects. A bot declares "this message is of kind X" via a label. Other bots subscribe to kind X. The server routes based on labels, not content.
+Labels solve this by making annotations first-class routing objects. A bot declares "this message is of kind X" via a label. Other bots subscribe to kind X. The server routes based on labels, not content. The server does not know what labels *mean* — it only evaluates predicates and routes to matching subscribers.
+
+This is the fundamental separation: the server is a coordinator, not a processor. It routes; bots decide.
+
+### Why RPC is labels, not a separate system
+
+RPC (bot-to-bot service calls) could have been a separate mechanism — dedicated events, a separate routing table, a service registry. Instead, it is label routing with a `request_id` in metadata. This is intentional.
+
+A separate RPC system would be privileged — invisible to UI clients, disconnected from the annotation pipeline, harder to debug. By making RPC use the same label-routing mechanism as everything else, we get:
+
+- **Transparency:** a GUI client that subscribes to RPC labels can see which bots are calling which services. No separate debug mode needed.
+- **Composability:** a bot that calls the math service, then the LLM service, then the sentiment service — that composition uses the same mechanism as label routing. No new abstractions.
+- **Simplicity:** no service registry, no separate routing table, no RPC-specific auth. Just labels and message types.
+
+The service vocabulary (what `service:math` or `service:llm-query` means) is emergent. The routing mechanism is protocol.
+
+### Why `call_rpc` is on the client, not the bot
+
+`call_rpc` lives on `MeadowClient` because any client type should be able to call services — not just bots. A TUI client can call a math service. A GUI client can call an LLM service. A bot can call another bot's service. The async pattern (`await client.call_rpc(...)`) means:
+
+- A slow service does not block the caller
+- Multiple RPC calls can run concurrently
+- Timeouts are enforced at the transport level, not in bot logic
+
+This is not convenience; it is architectural. It means the platform is a substrate for service composition, not just chat.
+
+### Why emergence over prescription
+
+The platform does not prescribe what bots do. It provides mechanisms (labels, RPC, patterns) and lets bots compose them. A "sentiment service" is not a server feature — it is a bot that subscribes to messages and emits sentiment labels. A "math service" is not a server feature — it is a bot that responds to RPC requests.
+
+The vocabulary is emergent. The mechanism is protocol. This is the deepest design principle: the platform provides the *how* (routing, persistence, auth), and bots provide the *what* (sentiment analysis, math, LLM queries).
 
 ### Why a separate package for JSON Logic
 
@@ -530,6 +560,10 @@ Metadata is enrichment, not identity. If metadata were part of the key, a bot pr
 ### Why append-only
 
 Labels are facts about messages. Facts don't un-happen. If a label's semver is wrong, bump the semver. Deletion adds complexity and breaks the guarantee that a subscriber who saw a label can rely on it existing forever.
+
+### Why JSON Logic, not Python code
+
+Label predicates are JSON Logic rules — boolean expressions over label data. JSON Logic cannot have state, which makes statelessness structurally enforced rather than trusted via sandbox isolation. A bot author writes `{"regex_match": [{"var": "label"}, "^sentiment$"]}` — not Python code that might import the server, access the filesystem, or hang in an infinite loop. The constraint is in the mechanism, not in a policy document.
 
 ## Future possibilities
 

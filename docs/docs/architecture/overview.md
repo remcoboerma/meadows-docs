@@ -1,11 +1,35 @@
 ---
 title: Architecture Overview
-description: How MEADOWS is structured
+description: Why MEADOWS exists and how it is structured
 ---
 
 # Architecture Overview
 
-MEADOWS follows a **protocol-first architecture** with strict dependency boundaries.
+MEADOWS follows a **protocol-first architecture** with strict dependency boundaries. This is not accidental — it is the result of a specific philosophy about what a platform should be.
+
+## Philosophy
+
+### The platform is a substrate, not a framework
+
+MEADOWS does not tell bots what to do. It provides mechanisms — labels for routing, RPC for service calls, patterns for content matching — and lets bots compose them. A "sentiment service" is not a server feature; it is a bot that subscribes to messages and emits sentiment labels. A "math service" is not a server feature; it is a bot that responds to RPC requests. The vocabulary is emergent. The mechanism is protocol.
+
+This is the deepest design principle: the platform provides the *how* (routing, persistence, auth), and bots provide the *what* (sentiment analysis, math, LLM queries). The separation is what makes a second frontend, an alternative server, or a federating layer possible without reading the whole codebase.
+
+### Mechanism is protocol, vocabulary is domain
+
+The test for what belongs in `meadows-protocol`: does the server need this fact for its structural job (routing, storing, generating, notifying)? If yes, and the meaning is irrelevant to the mechanism — it belongs in protocol. If the server only relays it untouched — it belongs in domain.
+
+**Labels** are mechanism: the server routes on `(origin, label, semver)`. What `sentiment` or `service:math` *means* is emergent between bots and users. **RPC** is mechanism: the server routes `RPC_REQUEST` to label subscribers. What a "math service" or "LLM query" *does* is domain. **Message types** are mechanism: `USER`, `BOT`, `RPC_REQUEST`, `RPC_RESPONSE`. The content of those messages is opaque.
+
+### Emergence over prescription
+
+The platform does not prescribe what bots do. It provides mechanisms and lets bots compose them. A bot that calls the math service, then the LLM service, then the sentiment service — that composition is not a platform feature. It is a bot author's decision. The platform enables it; the bot defines it.
+
+This is why `call_rpc` is on `MeadowClient`, not `BaseBot`. Any client — bot, TUI, GUI — can call any service. The service vocabulary is emergent; the routing mechanism is protocol.
+
+### The docent test
+
+Every piece of documentation, every SDK surface, every error message must pass the docent test: can a Dutch teacher (groep 6), together with an AI, use this to build a working bot without reading the source code? If the answer is no, the documentation is not done.
 
 ## Dependency graph
 
