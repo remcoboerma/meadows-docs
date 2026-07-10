@@ -29,7 +29,13 @@ Think of it like a wristband at a festival: you get it at the entrance, it ident
 
 ### Getting a token
 
-Ask the server operator for a token. They generate one with:
+There are two ways to get a token:
+
+**Via the web interface.** If you have the right permissions, you can generate tokens directly in the chat UI. Look for the token generation buttons in the sidebar or settings panel. You can create:
+- A **user token** for yourself (if you have `user-invite` permission)
+- A **bot token** for a bot you want to run (if you have `bot-invite` permission)
+
+**Via the server operator.** If you don't have permission to generate tokens yourself, ask the server operator. They generate one with:
 
 ```bash
 cd meadows-server
@@ -124,6 +130,8 @@ uv run edwh local.bot-jwt --name=echo
 ```
 
 Share the user tokens with your users. They paste them in the web UI.
+
+Alternatively, grant `user-invite` and/or `bot-invite` permissions to trusted users so they can generate their own tokens directly through the web interface — no CLI access needed. This is useful in hackathon settings where participants need to create their own bots.
 
 ### Serve the web frontend
 
@@ -223,8 +231,8 @@ Someone hosts a MEADOWS server. You have a user JWT and permission to generate b
 
 - Python >= 3.12
 - [uv](https://docs.astral.sh/uv/) package manager
-- A user JWT (from the server operator)
-- Permission to generate bot JWTs
+- A user JWT (from the server operator or via the web interface)
+- Permission to generate bot JWTs (`bot-invite` permission)
 
 ### 1. Clone the bot SDK
 
@@ -235,6 +243,8 @@ uv pip install -e ".[dev]"
 ```
 
 ### 2. Generate a bot token
+
+If you have `bot-invite` permission, you can generate a bot token directly in the web interface. Otherwise, ask the server operator or use the CLI:
 
 ```bash
 cd meadows-server
