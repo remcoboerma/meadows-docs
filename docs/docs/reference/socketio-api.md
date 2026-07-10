@@ -19,11 +19,12 @@ All application events are on the **`/chat`** namespace. The client connects, em
 
 | Event | Direction | Auth | Description |
 |---|---|---|---|
-| `message` | client → server | yes | Send a message. Server broadcasts to group, persists to JSONL, routes `@bot` mentions, evaluates patterns. |
+| `message` | client → server | yes | Send a message. Server broadcasts to group, persists to JSONL, routes `@bot` mentions, evaluates patterns, evaluates label subscriptions. |
 | `typing` | client → server | yes | Typing indicator (rate-limited to 1/sec). |
 | `remove_message` | client → server | yes | Mark a message as removed (strikethrough). |
 | `fetch_messages` | client → server | yes | Fetch specific messages by ID. |
 | `bot_response` | client → server | bot only | Bot sends a response. |
+| `link_click` | client → server | yes | Track that a user clicked a link in a message. |
 
 ## Group events
 
@@ -54,6 +55,13 @@ All application events are on the **`/chat`** namespace. The client connects, em
 | `unregister_label_subscription` | client → server | bot only | Remove a label subscription by name. |
 | `label_assigned` | client → server | bot only | Bot emits a label on a message (dedup + cascade). |
 
+## Ntfy events
+
+| Event | Direction | Auth | Description |
+|---|---|---|---|
+| `get_ntfy_prefs` | client → server | yes | Request the user's ntfy notification preferences. |
+| `save_ntfy_prefs` | client → server | yes | Save ntfy notification preferences. |
+
 ## JWT invite events
 
 | Event | Direction | Auth | Description |
@@ -72,18 +80,26 @@ All application events are on the **`/chat`** namespace. The client connects, em
 | `message_removed` | Message marked as removed |
 | `user_typing` | Typing indicator |
 | `joined_group` | Group joined (includes history) |
+| `left_group` | Group left |
 | `group_list` | Full list of groups |
 | `group_created` | New group created |
 | `group_deleted` | Group deleted |
 | `members_updated` | Group membership changed |
 | `bot_list` | List of registered bots |
+| `bot_registered` | Bot successfully registered |
+| `bot_unregistered` | Bot disconnected |
 | `bot_command` | @bot mention routed to bot |
 | `bot_not_found` | @mention targets nothing |
 | `rate_limited` | Bot exceeded 30 msg/min |
+| `pattern_registered` | Pattern registration ack |
+| `pattern_unregistered` | Pattern removal ack |
 | `pattern_matched` | Regex pattern matched a message |
 | `label_subscription_registered` | Label subscription registered |
 | `label_subscription_unregistered` | Label subscription removed |
 | `label_assigned` | Label matched a subscription |
+| `reaction_added` | Reaction added to a message |
+| `ntfy_prefs` | Ntfy notification preferences |
+| `ntfy_prefs_saved` | Ntfy preferences save ack |
 | `error` | Generic error |
 
 ## Rate limiting
