@@ -33,13 +33,25 @@ Every piece of documentation, every SDK surface, every error message must pass t
 
 ## Dependency graph
 
-```
-meadows-protocol  ←  meadows-client  ←  meadows-bot
-meadows-protocol  ←  meadows-server
-meadows-protocol  ←  meadows-web
-meadows-protocol  ←  meadows-jsonlogic  ←  meadows-server
-meadows-protocol  ←  meadows-jsonlogic  ←  meadows-client
-meadows-client + meadows-protocol  ←  meadows-tui
+```mermaid
+graph TD
+    P[meadows-protocol]
+    J[meadows-jsonlogic]
+    C[meadows-client]
+    B[meadows-bot]
+    S[meadows-server]
+    W[meadows-web]
+    T[meadows-tui]
+
+    P --> J
+    P --> C
+    P --> S
+    P --> W
+    P --> T
+    J --> S
+    J --> C
+    C --> B
+    C --> T
 ```
 
 ## The six packages

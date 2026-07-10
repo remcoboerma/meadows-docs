@@ -9,19 +9,11 @@ Each MEADOWS package has its own `Dockerfile` and `docker-compose.yml` for indep
 
 ## Production architecture
 
-```
-                    ┌─────────────┐
-                    │   Traefik   │
-                    │  (TLS/SSL)  │
-                    └──────┬──────┘
-                           │
-              ┌────────────┼────────────┐
-              │            │            │
-        ┌─────┴─────┐ ┌────┴────┐ ┌─────┴─────┐
-        │ meadows-  │ │meadows- │ │ meadows-  │
-        │  server   │ │  web    │ │   docs    │
-        │  :8080    │ │  :8081  │ │  :8000    │
-        └───────────┘ └─────────┘ └───────────┘
+```mermaid
+graph TD
+    T[Traefik<br>TLS/SSL] --> S[meadows-server<br>:8080]
+    T --> W[meadows-web<br>:8081]
+    T --> D[meadows-docs<br>:8000]
 ```
 
 ## Server deployment

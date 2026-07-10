@@ -9,19 +9,30 @@ description: How bots send interactive forms and receive submissions via label-b
 
 ## How it works
 
-```
-Bot-A sends form ──→ Server broadcasts ──→ Browser renders HTML form
-                                               │
-                                          User fills in
-                                               │
-                                          Submit → Server
-                                               │
-                                          Label evaluation
-                                               │
-                    ┌──────────────────────────┼──────────────────────────┐
-                    │                          │                          │
-               Bot-A receives            Bot-B receives            Bot-C receives
-               (matches own label)       (matches wildcard)        (matches origin)
+```mermaid
+sequenceDiagram
+    participant BotA as Bot-A
+    participant Server
+    participant Browser
+    participant BotB as Bot-B
+    participant BotC as Bot-C
+
+    BotA->>Server: send_form("How was your day?")
+    Server->>Browser: broadcast (interactive-form label)
+    Browser->>Browser: render HTML form
+    Browser->>Server: form_submission (answer_label + response data)
+    Server->>Server: evaluate label subscriptions
+
+    par Bot-A matches own label
+        Server->>BotA: MESSAGE (form_submission)
+        BotA->>Server: "Thanks for filling out!"
+    and Bot-B matches wildcard
+        Server->>BotB: MESSAGE (form_submission)
+        BotB->>BotB: archive to database
+    and Bot-C matches origin
+        Server->>BotC: MESSAGE (form_submission)
+        BotC->>Server: shy emoticon
+    end
 ```
 
 **Key insight:** the bot that creates the form is not necessarily the bot that processes the response. Any bot subscribed to a matching label receives the submission.

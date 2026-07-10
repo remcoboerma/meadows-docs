@@ -23,10 +23,11 @@ The browser connects directly to `meadows-server` via Socket.IO. This Python ser
 
 ## Architecture
 
-```
-Browser (JS)
-  ├── Socket.IO ──→ meadows-server:8080
-  └── HTTP ──→ meadows-web:8081 (static files only)
+```mermaid
+graph LR
+    B[Browser<br>JS] -->|Socket.IO| S[meadows-server<br>:8080]
+    B -->|HTTP| W[meadows-web<br>:8081]
+    W -.->|static files only| B
 ```
 
 ## Install
