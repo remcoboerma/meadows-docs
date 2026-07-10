@@ -101,7 +101,7 @@ extra:
 nav:
   - Home: index.md
   - Getting Started:
-      - Quickstart: getting-started.md
+      - Overview: getting-started.md
       - Installation: installation.md
   - Architecture:
       - Overview: architecture/overview.md
