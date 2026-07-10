@@ -146,6 +146,8 @@ Subscriptions use [JSON Logic](https://jsonlogic.com/) with three custom operato
 
 All standard JSON Logic operators work too: `==`, `!=`, `>`, `>=`, `<`, `<=`, `and`, `or`, `!`, `var`, `in`, `cat`, `+`, `-`, `*`, `/`, `?:`, `min`, `max`, `count`, `log`.
 
+**Performance:** `regex_match` patterns are compiled once and cached via `lru_cache(4096)` in `meadows-jsonlogic`. Subscriptions are static (registered once, evaluated on every message), so each unique pattern is compiled exactly once for the server's lifetime. Python's internal `re._cache` (512 entries) is a global LRU that evicts under load — the explicit cache survives.
+
 ### Example predicates
 
 Match any label from the sentiment bot:
