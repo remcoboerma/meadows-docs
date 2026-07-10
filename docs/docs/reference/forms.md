@@ -140,7 +140,7 @@ if __name__ == "__main__":
             "and": [
                 {"==": [{"var": "origin"}, "bot-poll"]},
                 {"==": [{"var": "label"}, "poll-response"]},
-                {"semver_match": [">=1.0.0", {"var": "semver"}]},
+                {"semver_match": ["^1.0.0", {"var": "semver"}]},
             ]
         },
         scope="global",
@@ -164,7 +164,7 @@ The predicate uses JSON Logic to match against label fields:
     "and": [
         {"==": [{"var": "origin"}, "bot-poll"]},           # exact match on origin
         {"regex_match": [{"var": "label"}, "^poll-"]},      # regex on label name
-        {"semver_match": [">=1.0.0", {"var": "semver"}]},  # semver range
+        {"semver_match": ["^1.0.0", {"var": "semver"}]},  # semver range
     ]
 }
 ```

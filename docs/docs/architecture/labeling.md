@@ -68,7 +68,7 @@ A subscription is a name + a JSON Logic predicate + a delivery mode:
     "and": [
       {"regex_match": [{"var": "origin"}, "^bot-sentiment$"]},
       {"regex_match": [{"var": "label"}, "^sentiment$"]},
-      {"semver_match": [">=1.0.0", {"var": "semver"}]}
+      {"semver_match": ["^1.0.0", {"var": "semver"}]}
     ]
   },
   "scope": "global",
@@ -141,7 +141,7 @@ Subscriptions use [JSON Logic](https://jsonlogic.com/) with three custom operato
 | Operator | Purpose | Example |
 |----------|---------|---------|
 | `regex_match(a, b)` | `re.search(b, a)` with case-insensitive | `{"regex_match": [{"var": "origin"}, "^bot-sentiment$"]}` |
-| `semver_match(a, b)` | Version b satisfies range a | `{"semver_match": [">=1.0.0", {"var": "semver"}]}` |
+| `semver_match(a, b)` | Version b satisfies range a | `{"semver_match": ["^1.0.0", {"var": "semver"}]}` |
 | `semver_eq(a, b)` | Exact semver equality | `{"semver_eq": [{"var": "semver"}, "1.0.0"]}` |
 
 All standard JSON Logic operators work too: `==`, `!=`, `>`, `>=`, `<`, `<=`, `and`, `or`, `!`, `var`, `in`, `cat`, `+`, `-`, `*`, `/`, `?:`, `min`, `max`, `count`, `log`.
@@ -304,7 +304,7 @@ if __name__ == "__main__":
             "and": [
                 {"regex_match": [{"var": "origin"}, "^bot-sentiment$"]},
                 {"regex_match": [{"var": "label"}, "^sentiment$"]},
-                {"semver_match": [">=1.0.0", {"var": "semver"}]},
+                {"semver_match": ["^1.0.0", {"var": "semver"}]},
             ]
         },
         scope="global",
@@ -379,7 +379,7 @@ if __name__ == "__main__":
         "echo-service",
         {"and": [
             {"regex_match": [{"var": "label"}, "^service:echo$"]},
-            {"semver_match": [">=1.0.0", {"var": "semver"}]},
+            {"semver_match": ["^1.0.0", {"var": "semver"}]},
         ]},
         scope="global",
         deliver="message_only",
