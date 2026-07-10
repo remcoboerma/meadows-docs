@@ -414,6 +414,36 @@ class RPCCallerBot(BaseBot):
                 self.log(f"Response (req={request_id}): {data['content']}")
 ```
 
+### call_rpc — async/await for bot-to-bot calls
+
+For bots that need to treat RPC like a function call, `call_rpc` wraps the fire-and-forget pattern in an async/await:
+
+```python
+class DependentBot(BaseBot):
+    BOT_NAME = "dependent"
+
+    async def process(self, content: str) -> str:
+        # Blocks until the math service responds (or 30s timeout)
+        result = await self.call_rpc("service:math", f"add {content}")
+        return f"Calculated: {result}"
+```
+
+`call_rpc` is async — it must be called from an async context. The SDK creates an `asyncio.Future` internally, sends the `RPC_REQUEST`, and resolves the future when the matching `RPC_RESPONSE` arrives. A `TimeoutError` is raised if the service doesn't respond in time.
+
+```python
+async def call_rpc(
+    self,
+    service_label: str,
+    content: str,
+    *,
+    origin: str | None = None,
+    semver: str = "1.0.0",
+    timeout: float = 30.0,
+) -> str
+```
+
+You can combine `call_rpc` with `on_rpc_response` callbacks — both fire when the response arrives. The future resolves first, then the callback runs.
+
 ### Running the RPC example
 
 ```bash
