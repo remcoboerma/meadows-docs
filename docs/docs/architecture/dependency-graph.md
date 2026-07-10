@@ -57,7 +57,7 @@ graph TD
 | `meadows-bot` | `meadows-client`, `meadows-protocol` | `uv pip install -e .` |
 | `meadows-server` | `meadows-protocol`, `meadows-jsonlogic`, `python-socketio`, `endow` | `uv pip install -e ".[dev]"` |
 | `meadows-web` | `meadows-protocol`, `starlette` | `uv pip install -e ".[dev]"` |
-| `meadows-tui` | `meadows-client`, `meadows-protocol`, `textual` | `uv pip install -e ".[dev]"` |
+| `meadows-tui` | `meadows-client`, `meadows-protocol` | `uv pip install -e ".[dev]"` |
 
 ## Editable dependencies
 

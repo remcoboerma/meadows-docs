@@ -67,7 +67,7 @@ graph TD
 | `meadows-bot` | `meadows.bot` | Bot SDK: `BaseBot`, `LLMBot`, [`send_form()`](../reference/forms.md#sending-a-form), [`call_rpc()`](../architecture/labeling.md#rpc-via-labels), ready-to-use bots. | The bot-author surface. Quick-start: `BOT_NAME` + `should_handle` + `handle` + `connect()`. |
 | `meadows-server` | `meadows.server` | Coordination hub: Socket.IO server, JWT auth, persistence, [label evaluation](../architecture/labeling.md#how-routing-works), pattern matching, RPC routing, rate limiting. | The message broker. Routes, stores, authenticates. No domain logic. |
 | `meadows-web` | `meadows.web` | Dumb HTTP host: serves `index.html` and static assets. No Socket.IO, no auth. | The browser is the real client. This package is just a file server. |
-| `meadows-tui` | `meadows.tui` | Terminal UI client built with Textual. | A second frontend proving the protocol supports multiple UIs. |
+| `meadows-tui` | `meadows.tui` | Terminal UI client built with curses. | A second frontend proving the protocol supports multiple UIs. |
 
 ## Language-agnostic by design
 
@@ -98,7 +98,7 @@ The server has no UI. It serves Socket.IO events and persists messages — nothi
 | Frontend | Package | Technology | Status |
 |----------|---------|------------|--------|
 | Web browser | `meadows-web` | HTML/JS, connects directly to server via Socket.IO | Built |
-| Terminal | `meadows-tui` | Python/Textual, connects via `meadows-client` | Built |
+| Terminal | `meadows-tui` | Python/curses, connects via `meadows-client` | Built |
 | Android | — | Any Socket.IO client library | Possible |
 | iOS/Swift | — | [Socket.IO-Client-Swift](https://github.com/socketio/socket.io-client-swift) | Possible |
 | SSH | — | Terminal multiplexer forwarding TUI output | Possible |

@@ -5,8 +5,8 @@ description: Terminal UI client
 
 # meadows-tui
 
-> MEADOWS terminal UI client: a Textual-based TUI chat client for MEADOWS.
-> Uses click for CLI argument parsing and Textual for the terminal interface.
+> MEADOWS terminal UI client: a curses-based TUI chat client for MEADOWS.
+> Uses click for CLI argument parsing and curses for the terminal interface.
 > Connects directly to meadows-server via Socket.IO using meadows-client.
 
 **Repository:** [github.com/remcoboerma/meadows-tui](https://github.com/remcoboerma/meadows-tui)
@@ -72,5 +72,5 @@ meadows-tui --server http://chat.example.com:8080 --token eyJ...
 
 1. **Protocol constants only.** The only import from `meadows.protocol` is `EventName`.
 2. **Transport via meadows-client.** No raw Socket.IO usage; all transport goes through `MeadowClient`.
-3. **Event bridge.** Socket.IO events are translated to Textual `Message` subclasses in `client_bridge.py`.
+3. **Event bridge.** Socket.IO events are translated to curses-compatible messages in `client_bridge.py`.
 4. **PEP 420 namespace.** `src/meadows/tui/__init__.py` exists; no `src/meadows/__init__.py`.

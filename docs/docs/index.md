@@ -55,7 +55,7 @@ graph TD
 - **`meadows-bot`** — bot SDK with `BaseBot`, `LLMBot`, `send_form()`, `call_rpc()`, and ready-to-use bots.
 - **`meadows-server`** — the coordination hub: Socket.IO server, JWT auth, persistence, label evaluation, RPC routing.
 - **`meadows-web`** — dumb HTTP host serving the browser-based chat UI. No Socket.IO, no auth.
-- **`meadows-tui`** — terminal UI client built with Textual.
+- **`meadows-tui`** — terminal UI client built with curses.
 
 ## How it works
 
