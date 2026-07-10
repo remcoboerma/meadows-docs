@@ -22,7 +22,7 @@ All application events are on the **`/chat`** namespace. The client connects, em
 | `message` | client → server | yes | Send a message. Server broadcasts to group, persists to JSONL, routes `@bot` mentions, evaluates patterns, evaluates label subscriptions. |
 | `typing` | client → server | yes | Typing indicator (rate-limited to 1/sec). |
 | `remove_message` | client → server | yes | Mark a message as removed (strikethrough). |
-| `fetch_messages` | client → server | yes | Fetch specific messages by ID. |
+| `fetch_messages` | client → server | yes | Fetch specific messages by ID. Server responds with `fetch_messages_result`. |
 | `bot_response` | client → server | bot only | Bot sends a response. |
 | `link_click` | client → server | yes | Track that a user clicked a link in a message. |
 
@@ -60,6 +60,23 @@ RPC uses the existing `message` event with `type` set to `rpc_request` or `rpc_r
 - **Correlation.** The `request_id` in label metadata ties response to request. The caller's `call_rpc()` future resolves when a matching `RPC_RESPONSE` arrives.
 - **Deliver modes.** Service bots subscribe with `deliver="message_only"` to receive the full message content. The server loads the message from persistence and emits it as a `MESSAGE` event to the subscriber.
 
+## Message types
+
+Every `message` event carries a `type` field that determines how the server and clients handle it:
+
+| Type | Value | Description |
+|---|---|---|
+| `user` | `user` | Human-authored message |
+| `bot` | `bot` | Bot-authored message |
+| `reaction` | `reaction` | Reaction to another message (carries `emoji` + `target_message_id`) |
+| `form_submission` | `form_submission` | Interactive form response (reserved, not yet implemented) |
+| `webhook` | `webhook` | Message received via HTTP webhook |
+| `system` | `system` | System-generated message |
+| `rpc_request` | `rpc_request` | RPC request to a service bot (routes via labels only) |
+| `rpc_response` | `rpc_response` | RPC response from a service bot (routes via labels only) |
+
+GUI/TUI clients typically filter on `user` and `bot` types. RPC and system messages are invisible to chat rendering unless the client explicitly subscribes to them.
+
 ## Group events
 
 | Event | Direction | Auth | Description |
@@ -74,7 +91,7 @@ RPC uses the existing `message` event with `type` set to `rpc_request` or `rpc_r
 
 | Event | Direction | Auth | Description |
 |---|---|---|---|
-| `add_reaction` | client → server | yes | Toggle a reaction (emoji) on a message. |
+| `add_reaction` | client → server | yes | Toggle a reaction (emoji) on a message. If the same emoji exists from the same user, it is removed (toggle). |
 | `remove_reaction` | client → server | yes | Explicitly remove a reaction. |
 
 ## Bot events
@@ -105,36 +122,44 @@ RPC uses the existing `message` event with `type` set to `rpc_request` or `rpc_r
 
 ## Server-to-client events
 
-| Event | Trigger |
-|---|---|
-| `authenticated` | User auth success |
-| `bot_authenticated` | Bot auth success |
-| `auth_error` | Auth failure |
-| `message` | Message broadcast |
-| `message_removed` | Message marked as removed |
-| `user_typing` | Typing indicator |
-| `joined_group` | Group joined (includes history) |
-| `left_group` | Group left |
-| `group_list` | Full list of groups |
-| `group_created` | New group created |
-| `group_deleted` | Group deleted |
-| `members_updated` | Group membership changed |
-| `bot_list` | List of registered bots |
-| `bot_registered` | Bot successfully registered |
-| `bot_unregistered` | Bot disconnected |
-| `bot_command` | @bot mention routed to bot |
-| `bot_not_found` | @mention targets nothing |
-| `rate_limited` | Bot exceeded 30 msg/min |
-| `pattern_registered` | Pattern registration ack |
-| `pattern_unregistered` | Pattern removal ack |
-| `pattern_matched` | Regex pattern matched a message |
-| `label_subscription_registered` | Label subscription registered |
-| `label_subscription_unregistered` | Label subscription removed |
-| `label_assigned` | Label matched a subscription |
-| `reaction_added` | Reaction added to a message |
-| `ntfy_prefs` | Ntfy notification preferences |
-| `ntfy_prefs_saved` | Ntfy preferences save ack |
-| `error` | Generic error |
+| Event | Trigger | Payload |
+|---|---|---|
+| `authenticated` | User auth success | — |
+| `bot_authenticated` | Bot auth success | — |
+| `auth_error` | Auth failure | `{error}` |
+| `my_permissions` | Sent after auth | `{permissions, available_permissions}` |
+| `message` | Message broadcast | Full message envelope |
+| `message_removed` | Message marked as removed | `{message_id, group_id}` |
+| `user_typing` | Typing indicator | `{user_id, group_id}` |
+| `joined_group` | Group joined (includes history) | `{group_id, messages, members}` |
+| `left_group` | Group left | `{group_id}` |
+| `user_joined` | Someone joined a group (room broadcast, skip_sid) | `{user_id, group_id}` |
+| `user_left` | Someone left a group (room broadcast, skip_sid) | `{user_id, group_id}` |
+| `group_list` | Full list of groups | `{groups}` |
+| `group_created` | New group created | Group state |
+| `group_deleted` | Group deleted | `{group_id}` |
+| `members_updated` | Group membership changed | `{group_id, members}` |
+| `bot_list` | List of registered bots | `{bots}` |
+| `bot_registered` | Bot successfully registered | `{bot_name}` |
+| `bot_unregistered` | Bot disconnected | `{bot_name}` |
+| `bot_command` | @bot mention routed to bot | Full message envelope |
+| `bot_not_found` | @mention targets nothing | `{name}` |
+| `rate_limited` | Bot exceeded 30 msg/min | `{bot_name}` |
+| `pattern_registered` | Pattern registration ack | `{name}` |
+| `pattern_unregistered` | Pattern removal ack | `{name}` |
+| `pattern_matched` | Regex pattern matched a message | `{name, message_id, group_id}` |
+| `label_subscription_registered` | Label subscription registered | `{name}` |
+| `label_subscription_unregistered` | Label subscription removed | `{name}` |
+| `label_assigned` | Label matched a subscription | `{labels, target_msg_id, applied_by, subscription_name}` |
+| `reaction_added` | Reaction added to a message | `{emoji, target_message_id, user_id, group_id}` |
+| `reaction_toggled` | Same emoji toggled off | `{emoji, target_message_id, user_id, group_id}` |
+| `reaction_removed` | Reaction explicitly removed | `{emoji, target_message_id, user_id, group_id}` |
+| `fetch_messages_result` | Response to fetch_messages | `{request_id, messages}` |
+| `ntfy_prefs` | Ntfy notification preferences | Preferences data |
+| `ntfy_prefs_saved` | Ntfy preferences save ack | `{success}` |
+| `user_jwt_generated` | JWT minted for a user | `{token, username}` |
+| `bot_jwt_generated` | JWT minted for a bot | `{token, bot_name}` |
+| `error` | Generic error | `{error}` |
 
 ## Rate limiting
 
