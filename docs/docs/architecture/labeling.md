@@ -414,21 +414,19 @@ class RPCCallerBot(BaseBot):
                 self.log(f"Response (req={request_id}): {data['content']}")
 ```
 
-### call_rpc — async/await for bot-to-bot calls
+### call_rpc — async/await for RPC across all clients
 
-For bots that need to treat RPC like a function call, `call_rpc` wraps the fire-and-forget pattern in an async/await:
+`call_rpc` lives on `MeadowClient`, so it's available to bots, TUI, and GUI clients alike. It wraps the fire-and-forget pattern in an async/await:
 
 ```python
-class DependentBot(BaseBot):
-    BOT_NAME = "dependent"
+# In a bot
+result = await self.call_rpc("service:math", f"add {content}")
 
-    async def process(self, content: str) -> str:
-        # Blocks until the math service responds (or 30s timeout)
-        result = await self.call_rpc("service:math", f"add {content}")
-        return f"Calculated: {result}"
+# In a TUI or GUI client (MeadowClient directly)
+result = await client.call_rpc("service:math", "add 2 3", origin="bot-math-svc")
 ```
 
-`call_rpc` is async — it must be called from an async context. The SDK creates an `asyncio.Future` internally, sends the `RPC_REQUEST`, and resolves the future when the matching `RPC_RESPONSE` arrives. A `TimeoutError` is raised if the service doesn't respond in time.
+`call_rpc` is async — it must be called from an async context. The client creates an `asyncio.Future` internally, sends the `RPC_REQUEST`, and resolves the future when the matching `RPC_RESPONSE` arrives. A `TimeoutError` is raised if the service doesn't respond in time.
 
 ```python
 async def call_rpc(
@@ -439,10 +437,11 @@ async def call_rpc(
     origin: str | None = None,
     semver: str = "1.0.0",
     timeout: float = 30.0,
+    group_id: str = "general",
 ) -> str
 ```
 
-You can combine `call_rpc` with `on_rpc_response` callbacks — both fire when the response arrives. The future resolves first, then the callback runs.
+For bots, `BaseBot.call_rpc` is a thin wrapper that defaults `origin` to `BOT_NAME` and delegates to `self.client.call_rpc`. You can combine `call_rpc` with `on_rpc_response` callbacks — both fire when the response arrives. The future resolves first, then the callback runs.
 
 ### Running the RPC example
 
