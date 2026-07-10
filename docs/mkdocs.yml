@@ -63,7 +63,11 @@ markdown_extensions:
   - attr_list
   - admonition
   - pymdownx.details
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.inlinehilite
   - pymdownx.magiclink
   - pymdownx.betterem
@@ -104,6 +108,7 @@ nav:
       - Dependency Graph: architecture/dependency-graph.md
       - Protocol Boundary: architecture/protocol-boundary.md
       - Design Principles: architecture/design-principles.md
+      - Labeling System: architecture/labeling.md
   - Packages:
       - protocol/index.md
       - server/index.md
