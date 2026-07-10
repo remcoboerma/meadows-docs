@@ -252,7 +252,7 @@ graph TD
 | `meadows-jsonlogic` | Evaluates JSON Logic predicates with custom operators |
 | `meadows-protocol` | Declares `Label` model, `EventName` constants, `MessageType` values |
 | `meadows-server` | Subscription registry, label evaluation, dedup index, cascade, persistence |
-| `meadows-client` | `register_label_subscription()`, `on_label_assigned()`, reconnect replay |
+| `meadows-client` | `register_label_subscription()`, `on_label_assigned()`, `call_rpc()`, reconnect replay |
 | `meadows-bot` | Thin wrappers + `emit_label()` for the author surface |
 
 ## Example bots
