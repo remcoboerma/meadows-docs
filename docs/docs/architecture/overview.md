@@ -167,6 +167,8 @@ MEADOWS: **services participate in a shared conversation, the user sees all of t
 
 The conversation is not a side effect of the architecture. It *is* the architecture. The message is the unit of work. The label is the routing key. The subscription is the contract. And the human is not an API consumer — they are a participant in the same room as the bots.
 
+## Key design decisions
+
 1. **Hub is an object** — no module-level `sio` or state. `Hub()` is instantiated, wrapped, testable.
 2. **Single chokepoint emit** — all client-bound frames pass through `hub.emit_frame()` which validates against protocol.
 3. **Protocol is the only sibling dependency** — server never imports from bot/client, and vice versa.
