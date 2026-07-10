@@ -95,3 +95,53 @@ result = await client.call_rpc("service:math", "add 2 3", origin="bot-math-svc")
 ```
 
 `call_rpc` creates an `RPC_REQUEST` message, routes it via label subscriptions, and resolves when the matching `RPC_RESPONSE` arrives. Raises `asyncio.TimeoutError` on timeout.
+
+### Schema
+
+```mermaid
+sequenceDiagram
+    participant Caller as Client (caller)
+    participant Server
+    participant Service as Bot (service)
+
+    Caller->>Server: MESSAGE (type=RPC_REQUEST)<br>labels: [("bot-math-svc", "service:math", "1.0.0", {request_id: "a1b2"})]
+    Note over Caller: await Future(request_id="a1b2")
+    Server->>Server: Evaluate label subscriptions
+    Server->>Service: MESSAGE (deliver=message_only)
+    Service->>Server: MESSAGE (type=RPC_RESPONSE)<br>labels: [("bot-math-svc", "service:math-response", "1.0.0", {request_id: "a1b2"})]
+    Server->>Caller: MESSAGE (deliver=message_only)
+    Note over Caller: Future resolves → "5"
+    Caller-->>Caller: result = "5"
+```
+
+### Demo: concurrent calls
+
+Multiple `call_rpc` calls run independently — a slow service doesn't block other calls:
+
+```python
+import asyncio
+
+async def demo():
+    # Both calls start immediately
+    task_a = asyncio.create_task(client.call_rpc("service:math", "add 1 1", origin="bot-math-svc"))
+    task_b = asyncio.create_task(client.call_rpc("service:llm", "summarize hello world", origin="bot-llm"))
+
+    # They resolve independently — task_b doesn't wait for task_a
+    result_a = await task_a  # "2"
+    result_b = await task_b  # "Hello world is a greeting..."
+```
+
+### API
+
+```python
+async def call_rpc(
+    self,
+    service_label: str,      # Label to route to (e.g. "service:math")
+    content: str,            # Request payload
+    *,
+    origin: str | None = None,  # Label origin (defaults to caller identity)
+    semver: str = "1.0.0",   # Label semver
+    timeout: float = 30.0,   # Seconds before TimeoutError
+    group_id: str = "general",  # Group for persistence
+) -> str                     # Response content
+```

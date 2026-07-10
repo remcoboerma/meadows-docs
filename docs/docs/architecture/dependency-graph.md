@@ -9,6 +9,8 @@ description: Package dependency relationships
 meadows-protocol  ←  meadows-client  ←  meadows-bot
 meadows-protocol  ←  meadows-server
 meadows-protocol  ←  meadows-web
+meadows-protocol  ←  meadows-jsonlogic  ←  meadows-server
+meadows-protocol  ←  meadows-jsonlogic  ←  meadows-client
 meadows-client + meadows-protocol  ←  meadows-tui
 ```
 
@@ -35,9 +37,10 @@ meadows-client + meadows-protocol  ←  meadows-tui
 | Package | Depends on | Install |
 |---|---|---|
 | `meadows-protocol` | `pydantic` only | `uv pip install -e .` |
-| `meadows-client` | `meadows-protocol`, `python-socketio` | `uv pip install -e .` |
+| `meadows-jsonlogic` | `meadows-protocol` | `uv pip install -e .` |
+| `meadows-client` | `meadows-protocol`, `meadows-jsonlogic`, `python-socketio` | `uv pip install -e .` |
 | `meadows-bot` | `meadows-client`, `meadows-protocol` | `uv pip install -e .` |
-| `meadows-server` | `meadows-protocol`, `python-socketio`, `endow` | `uv pip install -e ".[dev]"` |
+| `meadows-server` | `meadows-protocol`, `meadows-jsonlogic`, `python-socketio`, `endow` | `uv pip install -e ".[dev]"` |
 | `meadows-web` | `meadows-protocol`, `starlette` | `uv pip install -e ".[dev]"` |
 | `meadows-tui` | `meadows-client`, `meadows-protocol`, `textual` | `uv pip install -e ".[dev]"` |
 
