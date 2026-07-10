@@ -23,7 +23,7 @@ All application events are on the **`/chat`** namespace. The client connects, em
 | `typing` | client → server | yes | Typing indicator (rate-limited to 1/sec). |
 | `remove_message` | client → server | yes | Mark a message as removed (strikethrough). |
 | `fetch_messages` | client → server | yes | Fetch specific messages by ID. Server responds with `fetch_messages_result`. |
-| `bot_response` | client → server | bot only | Bot sends a response. |
+| `bot_response` | client → server | bot only | **(deprecated — use `message` with bot auth)** Bot sends a response. |
 | `link_click` | client → server | yes | Track that a user clicked a link in a message. |
 
 ## RPC (via `message` event)
