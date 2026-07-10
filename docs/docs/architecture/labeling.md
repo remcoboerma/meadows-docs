@@ -614,7 +614,15 @@ The labeling mechanism is protocol. Transparancy is a UI responsibility. The ser
 
 ### Form submissions
 
-The existing forms mechanism (bots send HTML in markdown fences) will be formalized via labels. The label `("meadows", "interactive-form", "1.0.0")` declares "this message contains an interactive element." The payload stays opaque. This resolves the current gap where forms are detected by regex-sniffing markdown fences.
+Forms are implemented via labels. The label `("meadows", "interactive-form", "1.0.0")` declares "this message contains an interactive element." The payload stays opaque — the system doesn't understand what a "form" is.
+
+When a bot sends a form via `send_form()`, the message carries:
+- The `interactive-form` label (system signal for rendering)
+- The `answer_label` in `metadata['meadows']['form_handling']` (for routing responses)
+
+When a user submits the form, the frontend creates a `FORM_SUBMISSION` message with the `answer_label` as a label. Any bot subscribed to that label receives the submission. This is message-based routing — the form creator is not necessarily the response handler.
+
+See [Interactive Forms](../reference/forms.md) for the full reference.
 
 ### Temporal analysis
 

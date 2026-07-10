@@ -44,13 +44,13 @@ Before adding anything to `meadows-protocol`, ask: **does the server need this f
 
 ### Forms
 
-**Protocol** owns "this message contains an interactive element requiring a server-generated endpoint" — the `labels` mechanism and form submission event shape.
+**Protocol** owns the `interactive-form` label, the `FORM_SUBMISSION` MessageType, and the `form_handling` metadata structure. The server routes submissions via label subscriptions — no `form_id` registry.
 
 **Domain** owns field semantics — what fields exist, what they're called, what validation rules apply.
 
 ### Labels
 
-**Protocol** owns the label triplet mechanism `(origin, label, semver)` and the `Label` NamedTuple shape. The intended direction is JSON Logic predicates for labeling lambdas (see design principles), but this is not yet implemented.
+**Protocol** owns the label triplet mechanism `(origin, label, semver)` and the `Label` NamedTuple shape. JSON Logic predicates (`regex_match`, `semver_match`, `semver_eq`) are implemented in `meadows-jsonlogic`.
 
 **Domain** owns which schemas exist and what they're called.
 
