@@ -19,6 +19,9 @@ description: Client-side Socket.IO transport
 - `send_message()` constructs a valid protocol `Message` before emitting
 - `on(event, handler)` for user-registered handlers
 - `emit(event, data)` escape hatch for non-message events
+- `register_label_subscription()` / `unregister_label_subscription()` for label routing
+- `on_label_assigned()` callback registration for subscription matches
+- `call_rpc()` — async RPC via labels (send request, await response)
 
 ## Install
 
@@ -66,3 +69,29 @@ client = MeadowClient(
 ## Protocol contract
 
 This client never sends a frame that violates `meadows.protocol`. The `send_message()` method constructs a valid `Message` envelope before emitting, so the server-side chokepoint never sees an invalid frame from us.
+
+## Label subscriptions
+
+```python
+# Subscribe to labels matching a JSON Logic predicate
+client.register_label_subscription(
+    "sentiment-alerts",
+    {"regex_match": [{"var": "label"}, "^sentiment$"]},
+    scope="global",
+    deliver="label_only",
+)
+
+# Handle matched labels
+client.on_label_assigned("sentiment-alerts")(lambda data: print(data))
+```
+
+Subscriptions are replayed on reconnect.
+
+## RPC via labels
+
+```python
+# Send an RPC request and await the response (async)
+result = await client.call_rpc("service:math", "add 2 3", origin="bot-math-svc")
+```
+
+`call_rpc` creates an `RPC_REQUEST` message, routes it via label subscriptions, and resolves when the matching `RPC_RESPONSE` arrives. Raises `asyncio.TimeoutError` on timeout.

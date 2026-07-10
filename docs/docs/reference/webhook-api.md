@@ -28,6 +28,8 @@ Any valid JWT (user or bot). No specific permission required.
 | Field | Type | Required | Description |
 |---|---|---|---|
 | `content` | string | yes | Message content (markdown, max 100k chars) |
+| `type` | string | no | Message type. Defaults to `"webhook"`. Set to `"rpc_request"` or `"rpc_response"` for RPC. |
+| `labels` | array | no | Labels for RPC routing. Each label is `[origin, label, semver, metadata?]`. |
 
 ### Response
 
@@ -53,6 +55,7 @@ Any valid JWT (user or bot). No specific permission required.
 - `@everyone` / `@all` sets `is_everyone=true` if JWT has `mention-all`
 - Registered regex patterns are evaluated against the content
 - Sender identity is derived from the JWT (not the request body)
+- When `type` is `rpc_request` or `rpc_response`, the message skips room broadcast and routes exclusively via label subscriptions
 
 ### Examples
 
@@ -77,3 +80,16 @@ Any valid JWT (user or bot). No specific permission required.
     )
     print(resp.json())  # {"status": "ok", "message_id": "..."}
     ```
+
+### RPC via webhook
+
+Set `type` and `labels` to send RPC requests over HTTP:
+
+```bash
+curl -X POST http://localhost:8080/r/general \
+  -H "Authorization: Bearer $JWT" \
+  -H "Content-Type: application/json" \
+  -d '{"content":"add 2 3","type":"rpc_request","labels":[["bot-math-svc","service:math","1.0.0",{"request_id":"req-001"}]]}'
+```
+
+The `labels` field is an array of `[origin, label, semver, metadata?]` tuples. The metadata dict should include `request_id` for correlation. Both request and response are persisted to the group's JSONL file.

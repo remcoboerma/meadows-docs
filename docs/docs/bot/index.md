@@ -55,6 +55,11 @@ uv pip install -e ".[examples,dependency-heavy,llm]"
 | `ExportBot` | `export`, `exporteer` | Exports a thread to Markdown |
 | `RagBot` | `rag`, `zoek` | Video/audio fragment search |
 | `SLOBot` | `slo`, `leerdoel` | Dutch SLO curriculum search |
+| `SentimentBot` | — | Label producer: sentiment analysis on all messages |
+| `LabelListenerBot` | — | Label consumer: alerts on angry sentiment |
+| `EchoServiceBot` | `help` | Minimal RPC service (echo) |
+| `MathServiceBot` | `help`, `stats` | RPC service (arithmetic) |
+| `RPCCallerBot` | `echo`, `math` | Demonstrates RPC via labels |
 
 ## Bot-author surface
 
@@ -66,6 +71,8 @@ uv pip install -e ".[examples,dependency-heavy,llm]"
 | Start | `connect()` — waits 3s for server, then connects |
 | Helpers | `log()`, `get_sender_info()`, `format_help_response()` |
 | Patterns | `register_pattern()`, `unregister_pattern()`, `on_pattern_matched()` |
+| Labels | `register_label_subscription()`, `unregister_label_subscription()`, `on_label_assigned()`, `emit_label()` |
+| RPC | `emit_rpc_request()`, `emit_rpc_response()`, `on_rpc_response()`, `call_rpc()` |
 | History | `fetch_messages()` |
 | Lifecycle | `on_connect()`, `on_disconnect()` |
 

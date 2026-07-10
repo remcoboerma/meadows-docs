@@ -50,6 +50,9 @@ All application events are on the **`/chat`** namespace. The client connects, em
 | `bot_list_bots` | client → server | yes | Returns `bot_list`. |
 | `register_pattern` | client → server | bot only | Register a regex pattern (max 50/scope, 512 chars). |
 | `unregister_pattern` | client → server | bot only | Remove a pattern by name. |
+| `register_label_subscription` | client → server | bot only | Register a JSON Logic predicate against label data. |
+| `unregister_label_subscription` | client → server | bot only | Remove a label subscription by name. |
+| `label_assigned` | client → server | bot only | Bot emits a label on a message (dedup + cascade). |
 
 ## JWT invite events
 
@@ -78,6 +81,9 @@ All application events are on the **`/chat`** namespace. The client connects, em
 | `bot_not_found` | @mention targets nothing |
 | `rate_limited` | Bot exceeded 30 msg/min |
 | `pattern_matched` | Regex pattern matched a message |
+| `label_subscription_registered` | Label subscription registered |
+| `label_subscription_unregistered` | Label subscription removed |
+| `label_assigned` | Label matched a subscription |
 | `error` | Generic error |
 
 ## Rate limiting
