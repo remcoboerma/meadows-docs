@@ -122,6 +122,7 @@ nav:
       - CLI Commands: reference/cli-commands.md
       - Socket.IO API: reference/socketio-api.md
       - Webhook API: reference/webhook-api.md
+      - Interactive Forms: reference/forms.md
   - Development:
       - Contributing: development/contributing.md
       - Testing: development/testing.md

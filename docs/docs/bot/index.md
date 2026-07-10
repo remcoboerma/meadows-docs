@@ -60,6 +60,7 @@ uv pip install -e ".[examples,dependency-heavy,llm]"
 | `EchoServiceBot` | `help` | Minimal RPC service (echo) |
 | `MathServiceBot` | `help`, `stats` | RPC service (arithmetic) |
 | `RPCCallerBot` | `echo`, `math` | Demonstrates RPC via labels |
+| `TodoBot` | `add`, `list`, `edit`, `toggle`, `delete` | CRUD demo using interactive forms |
 
 ## Bot-author surface
 
@@ -72,6 +73,7 @@ uv pip install -e ".[examples,dependency-heavy,llm]"
 | Helpers | `log()`, `get_sender_info()`, `format_help_response()` |
 | Patterns | `register_pattern()`, `unregister_pattern()`, `on_pattern_matched()` |
 | Labels | `register_label_subscription()`, `unregister_label_subscription()`, `on_label_assigned()`, `emit_label()` |
+| Forms | `send_form()` — send interactive HTML forms, receive submissions via label subscriptions |
 | RPC | `emit_rpc_request()`, `emit_rpc_response()`, `on_rpc_response()`, `call_rpc()` |
 | History | `fetch_messages()` |
 | Lifecycle | `on_connect()`, `on_disconnect()` |
