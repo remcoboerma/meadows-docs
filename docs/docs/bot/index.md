@@ -6,7 +6,7 @@ description: Bot SDK for MEADOWS
 # meadows-bot
 
 > MEADOWS bot SDK: `BaseBot`, `LLMBot`, and ready-to-use bots. Bot-author-facing package with a fast quick-start.
-> Depends on `meadows-client` (transport) and `meadows-protocol` (shapes). Never imports from `meadows-server`.
+> Depends on [meadows-client](../client/index.md) (transport) and [meadows-protocol](../protocol/index.md) (shapes). Never imports from [meadows-server](../server/index.md).
 
 **Repository:** [github.com/remcoboerma/meadows-bot](https://github.com/remcoboerma/meadows-bot)
 
@@ -72,9 +72,9 @@ uv pip install -e ".[examples,dependency-heavy,llm]"
 | Start | `connect()` — waits 3s for server, then connects |
 | Helpers | `log()`, `get_sender_info()`, `format_help_response()` |
 | Patterns | `register_pattern()`, `unregister_pattern()`, `on_pattern_matched()` |
-| Labels | `register_label_subscription()`, `unregister_label_subscription()`, `on_label_assigned()`, `emit_label()` |
-| Forms | `send_form()` — send interactive HTML forms, receive submissions via label subscriptions |
-| RPC | `emit_rpc_request()`, `emit_rpc_response()`, `on_rpc_response()`, `call_rpc()` |
+| Labels | `register_label_subscription()`, `unregister_label_subscription()`, `on_label_assigned()`, `emit_label()` — see [Labeling System](../architecture/labeling.md) |
+| Forms | [`send_form()`](../reference/forms.md#sending-a-form) — send interactive HTML forms, receive submissions via [label subscriptions](../architecture/labeling.md#subscriptions) |
+| RPC | [`call_rpc()`](../architecture/labeling.md#rpc-via-labels), `emit_rpc_request()`, `emit_rpc_response()`, `on_rpc_response()` |
 | History | `fetch_messages()` |
 | Lifecycle | `on_connect()`, `on_disconnect()` |
 

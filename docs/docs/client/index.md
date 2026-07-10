@@ -19,9 +19,9 @@ description: Client-side Socket.IO transport
 - `send_message()` constructs a valid protocol `Message` before emitting
 - `on(event, handler)` for user-registered handlers
 - `emit(event, data)` escape hatch for non-message events
-- `register_label_subscription()` / `unregister_label_subscription()` for label routing
+- `register_label_subscription()` / `unregister_label_subscription()` for [label routing](../architecture/labeling.md#subscriptions)
 - `on_label_assigned()` callback registration for subscription matches
-- `call_rpc()` — async RPC via labels (send request, await response)
+- [`call_rpc()`](../architecture/labeling.md#rpc-via-labels) — async RPC via labels (send request, await response)
 
 ## Install
 

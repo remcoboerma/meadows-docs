@@ -5,25 +5,28 @@ description: Package dependency relationships
 
 # Dependency Graph
 
+Arrows point from dependent to dependency (A --> B means "A depends on B").
+
 ```mermaid
 graph TD
-    P[meadows-protocol]
     J[meadows-jsonlogic]
     C[meadows-client]
     B[meadows-bot]
     S[meadows-server]
     W[meadows-web]
     T[meadows-tui]
+    P[meadows-protocol]
 
-    P --> J
-    P --> C
-    P --> S
-    P --> W
-    P --> T
-    J --> S
-    J --> C
-    C --> B
-    C --> T
+    J --> P
+    C --> P
+    C --> J
+    S --> P
+    S --> J
+    W --> P
+    T --> P
+    T --> C
+    B --> C
+    B --> P
 ```
 
 ## Rules

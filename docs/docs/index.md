@@ -25,24 +25,25 @@ MEADOWS is a modular chat platform built around a **protocol-first architecture*
 
 ```mermaid
 graph TD
-    P[meadows-protocol<br><i>pure declarations</i>]
     J[meadows-jsonlogic<br><i>JSON Logic evaluator</i>]
     C[meadows-client<br><i>Socket.IO transport</i>]
     B[meadows-bot<br><i>BaseBot SDK</i>]
     S[meadows-server<br><i>coordination hub</i>]
     W[meadows-web<br><i>dumb HTTP host</i>]
     T[meadows-tui<br><i>terminal UI</i>]
+    P[meadows-protocol<br><i>pure declarations</i>]
     Browser[Browser JS<br><i>real client</i>]
 
-    P --> J
-    P --> C
-    P --> S
-    P --> W
-    P --> T
-    J --> S
-    J --> C
-    C --> B
-    C --> T
+    J --> P
+    C --> P
+    C --> J
+    S --> P
+    S --> J
+    W --> P
+    T --> P
+    T --> C
+    B --> C
+    B --> P
     W -.->|static files| Browser
     Browser -->|Socket.IO| S
     B -->|Socket.IO| S
@@ -58,10 +59,10 @@ graph TD
 
 ## How it works
 
-- **Labels** — the routing mechanism. Bots subscribe to label patterns via JSON Logic predicates; the server evaluates and delivers. [Labeling System](architecture/labeling.md)
-- **RPC** — bot-to-bot service calls via labels. A math service, an LLM proxy, a database — any bot can expose functionality. [Client Package](client/index.md)
-- **Forms** — interactive HTML sent by bots, submitted by users, routed to any subscribed bot via labels. [Interactive Forms](reference/forms.md)
-- **Microservices** — each bot is an independent service. The conversation is the message bus. Humans and bots are peers. [Architecture Overview](architecture/overview.md)
+- **[Labels](architecture/labeling.md)** — the routing mechanism. Bots subscribe to label patterns via [JSON Logic predicates](architecture/labeling.md#json-logic-predicates); the server evaluates and delivers.
+- **[RPC via labels](architecture/labeling.md#rpc-via-labels)** — bot-to-bot service calls. A math service, an LLM proxy, a database — any bot can expose functionality.
+- **[Forms](reference/forms.md)** — interactive HTML sent by bots, submitted by users, routed to any subscribed bot via labels.
+- **[Microservices](architecture/overview.md#microservices-but-for-conversation)** — each bot is an independent service. The conversation is the message bus. Humans and bots are peers.
 
 ## Quick links
 

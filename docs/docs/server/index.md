@@ -19,6 +19,8 @@ The server is the heart of MEADOWS. It handles:
 - **Group management** — create, join, leave, delete groups
 - **Bot routing** — `@bot` mention parsing and dispatch
 - **Pattern matching** — regex-based message interception for bots
+- **[Label subscription](../architecture/labeling.md#subscriptions) evaluation** — [JSON Logic](../architecture/labeling.md#json-logic-predicates) predicate matching against labels
+- **[RPC](../architecture/labeling.md#rpc-via-labels) routing** — bot-to-bot service calls via label routing
 - **Rate limiting** — 30 msg/min per bot with 60s cooldown
 - **Webhook API** — HTTP endpoint for injecting messages
 

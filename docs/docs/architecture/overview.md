@@ -11,7 +11,7 @@ MEADOWS follows a **protocol-first architecture** with strict dependency boundar
 
 ### The platform is a substrate, not a framework
 
-MEADOWS does not tell bots what to do. It provides mechanisms — labels for routing, RPC for service calls, patterns for content matching — and lets bots compose them. A "sentiment service" is not a server feature; it is a bot that subscribes to messages and emits sentiment labels. A "math service" is not a server feature; it is a bot that responds to RPC requests. The vocabulary is emergent. The mechanism is protocol.
+MEADOWS does not tell bots what to do. It provides mechanisms — [labels](../architecture/labeling.md) for routing, [RPC](../architecture/labeling.md#rpc-via-labels) for service calls, patterns for content matching — and lets bots compose them. A "sentiment service" is not a server feature; it is a bot that subscribes to messages and emits sentiment labels. A "math service" is not a server feature; it is a bot that responds to RPC requests. The vocabulary is emergent. The mechanism is protocol.
 
 This is the deepest design principle: the platform provides the *how* (routing, persistence, auth), and bots provide the *what* (sentiment analysis, math, LLM queries). The separation is what makes a second frontend, an alternative server, or a federating layer possible without reading the whole codebase.
 
@@ -19,7 +19,7 @@ This is the deepest design principle: the platform provides the *how* (routing, 
 
 The test for what belongs in `meadows-protocol`: does the server need this fact for its structural job (routing, storing, generating, notifying)? If yes, and the meaning is irrelevant to the mechanism — it belongs in protocol. If the server only relays it untouched — it belongs in domain.
 
-**Labels** are mechanism: the server routes on `(origin, label, semver)`. What `sentiment` or `service:math` *means* is emergent between bots and users. **RPC** is mechanism: the server routes `RPC_REQUEST` to label subscribers. What a "math service" or "LLM query" *does* is domain. **Message types** are mechanism: `USER`, `BOT`, `RPC_REQUEST`, `RPC_RESPONSE`. The content of those messages is opaque.
+**Labels** are mechanism: the server routes on `(origin, label, semver)`. What `sentiment` or `service:math` *means* is emergent between bots and users. **[RPC](../architecture/labeling.md#rpc-via-labels)** is mechanism: the server routes `RPC_REQUEST` to [label subscribers](../architecture/labeling.md#subscriptions). What a "math service" or "LLM query" *does* is domain. **Message types** are mechanism: `USER`, `BOT`, `RPC_REQUEST`, `RPC_RESPONSE`. The content of those messages is opaque.
 
 ### Emergence over prescription
 
@@ -33,63 +33,78 @@ Every piece of documentation, every SDK surface, every error message must pass t
 
 ## Dependency graph
 
+Arrows point from dependent to dependency (A --> B means "A depends on B").
+
 ```mermaid
 graph TD
-    P[meadows-protocol]
     J[meadows-jsonlogic]
     C[meadows-client]
     B[meadows-bot]
     S[meadows-server]
     W[meadows-web]
     T[meadows-tui]
+    P[meadows-protocol]
 
-    P --> J
-    P --> C
-    P --> S
-    P --> W
-    P --> T
-    J --> S
-    J --> C
-    C --> B
-    C --> T
+    J --> P
+    C --> P
+    C --> J
+    S --> P
+    S --> J
+    W --> P
+    T --> P
+    T --> C
+    B --> C
+    B --> P
 ```
 
-## The six packages
+## The packages
 
-### meadows-protocol
+| Package | Import | Description | Intent |
+|---------|--------|-------------|--------|
+| `meadows-protocol` | `meadows.protocol` | Pure declarations: Pydantic models, enums, constants. Zero behavior. | The single source of truth for all shared types. Language-agnostic — reimplementable in any language. |
+| `meadows-jsonlogic` | `meadows.jsonlogic` | [JSON Logic](../architecture/labeling.md#json-logic-predicates) evaluator with custom operators (`regex_match`, `semver_match`, `semver_eq`). | Shared by server and client. DRY — one implementation for label predicate evaluation. |
+| `meadows-client` | `meadows.client` | Socket.IO transport: connect, reconnect, JWT handshake, [label subscriptions](../architecture/labeling.md#subscriptions), [call_rpc()](../architecture/labeling.md#rpc-via-labels). | The second-implementation-cheap layer. Both bots and UI clients share transport. |
+| `meadows-bot` | `meadows.bot` | Bot SDK: `BaseBot`, `LLMBot`, [`send_form()`](../reference/forms.md#sending-a-form), [`call_rpc()`](../architecture/labeling.md#rpc-via-labels), ready-to-use bots. | The bot-author surface. Quick-start: `BOT_NAME` + `should_handle` + `handle` + `connect()`. |
+| `meadows-server` | `meadows.server` | Coordination hub: Socket.IO server, JWT auth, persistence, [label evaluation](../architecture/labeling.md#how-routing-works), pattern matching, RPC routing, rate limiting. | The message broker. Routes, stores, authenticates. No domain logic. |
+| `meadows-web` | `meadows.web` | Dumb HTTP host: serves `index.html` and static assets. No Socket.IO, no auth. | The browser is the real client. This package is just a file server. |
+| `meadows-tui` | `meadows.tui` | Terminal UI client built with Textual. | A second frontend proving the protocol supports multiple UIs. |
 
-Pure declarations. Pydantic models, enums, constants. **Zero behavior.** This is the single source of truth for all shared types.
+## Language-agnostic by design
 
-- `envelope.py` — `Message` model, `MessageType` enum
-- `events.py` — `EventName` constants (closed set of Socket.IO events)
-- `jwt.py` — `JWTClaims` model, `JWTRole`, `build_claims()` helper
-- `permissions.py` — `AVAILABLE_PERMISSIONS`
-- `labels.py` — `Label` model `(origin, name, version, metadata?)`
-- `codec.py` — reference encoder/decoder
+The [protocol](../protocol/index.md) is declared in data-message format — Pydantic models, JSON-serializable dicts, Socket.IO events. There is no Python-specific behavior in the protocol layer. Any language with a [Socket.IO client library](https://socket.io/docs/v4/#implementations) can connect to a MEADOWS server, authenticate with a JWT, and participate in the conversation.
 
-### meadows-jsonlogic
+This is not aspirational — it is structural. The wire format is JSON. The events are named strings. The authentication is a JWT in the handshake. A bot written in JavaScript, Go, Rust, or Swift talks the same protocol as a bot written in Python. The server doesn't know or care what language the client is written in.
 
-JSON Logic evaluator with custom operators (`regex_match`, `semver_match`, `semver_eq`). Single implementation shared by server and client — DRY.
+Socket.IO provides client libraries for:
 
-### meadows-client
+| Language | Library |
+|----------|---------|
+| JavaScript/TypeScript | [socket.io-client](https://github.com/socketio/socket.io-client) |
+| Python | [python-socketio](https://github.com/miguelgrinberg/python-socketio) |
+| Java | [socket.io-client-java](https://github.com/socketio/socket.io-client-java) |
+| C++ | [socket.io-client-cpp](https://github.com/socketio/socket.io-client-cpp) |
+| Swift | [Socket.IO-Client-Swift](https://github.com/socketio/socket.io-client-swift) |
+| Dart | [socket.io_client_dart](https://github.com/nick996/socket.io_client_dart) |
+| Rust | [rust-socketio](https://github.com/1c3t3a/rust-socketio) |
+| Go | [go-socket.io](https://github.com/googollee/go-socket.io) |
+| .NET | [socket.io-client-csharp](https://github.com/doghappy/socket.io-client-csharp) |
 
-Client-side Socket.IO transport. Connect, reconnect, JWT handshake, label subscriptions, `call_rpc()`. Used by both `meadows-bot` and `meadows-tui`.
+See the full list at [socket.io/docs/v4/#implementations](https://socket.io/docs/v4/#implementations).
 
-### meadows-bot
+## The server is headless
 
-Bot SDK with `BaseBot`, `LLMBot`, and ready-to-use bots. The bot-author-facing package.
+The server has no UI. It serves Socket.IO events and persists messages — nothing else. There are two separate UI packages, and more are possible:
 
-### meadows-server
+| Frontend | Package | Technology | Status |
+|----------|---------|------------|--------|
+| Web browser | `meadows-web` | HTML/JS, connects directly to server via Socket.IO | Built |
+| Terminal | `meadows-tui` | Python/Textual, connects via `meadows-client` | Built |
+| Android | — | Any Socket.IO client library | Possible |
+| iOS/Swift | — | [Socket.IO-Client-Swift](https://github.com/socketio/socket.io-client-swift) | Possible |
+| SSH | — | Terminal multiplexer forwarding TUI output | Possible |
+| Desktop | — | Electron, Tauri, or native with Socket.IO | Possible |
 
-The coordination hub. Socket.IO server, JWT authentication, message persistence, group management, pattern matching, label subscription evaluation, dedup index, RPC routing, rate limiting.
-
-### meadows-web
-
-Dumb HTTP host. Serves `index.html` and static assets. No Socket.IO, no auth, no domain logic. The browser is the real client.
-
-### meadows-tui
-
-Terminal UI client built with Textual. Connects via `meadows-client`.
+Each frontend is an independent package that implements the [protocol](../protocol/index.md). The server doesn't know which frontend is connected. A user on the web UI, a user on the TUI, and a bot are all peers in the same conversation.
 
 ## Microservices, but for conversation
 

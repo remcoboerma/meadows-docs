@@ -308,6 +308,6 @@ meadows-tui         → interactive-form label detection, degrade message
 
 ## See also
 
-- [Labeling system](../protocol/index.md) — how labels, subscriptions, and JSON Logic predicates work
-- [Bot SDK](../bot/index.md) — full bot-author surface including `send_form()`
+- [Labeling system](../architecture/labeling.md) — [label subscriptions](../architecture/labeling.md#subscriptions), [JSON Logic predicates](../architecture/labeling.md#json-logic-predicates)
+- [Bot SDK](../bot/index.md) — full bot-author surface including [`send_form()`](#sending-a-form)
 - [Socket.IO API](./socketio-api.md) — `form_submission` event reference
