@@ -26,6 +26,40 @@ All application events are on the **`/chat`** namespace. The client connects, em
 | `bot_response` | client → server | bot only | Bot sends a response. |
 | `link_click` | client → server | yes | Track that a user clicked a link in a message. |
 
+## RPC (via `message` event)
+
+RPC uses the existing `message` event with `type` set to `rpc_request` or `rpc_response`. There are no separate RPC Socket.IO events. The server routes RPC messages exclusively via label subscriptions — no room broadcast, no pattern evaluation, no `@bot` routing.
+
+### Sending an RPC request
+
+```json
+{
+  "content": "add 2 3",
+  "type": "rpc_request",
+  "group_id": "general",
+  "labels": [["bot-math-svc", "service:math", "1.0.0", {"request_id": "a1b2c3"}]]
+}
+```
+
+### Sending an RPC response
+
+```json
+{
+  "content": "5",
+  "type": "rpc_response",
+  "group_id": "general",
+  "labels": [["bot-math-svc", "service:math-response", "1.0.0", {"request_id": "a1b2c3"}]]
+}
+```
+
+### Behaviour
+
+- **No room broadcast.** RPC messages skip `emit_frame(EventName.MESSAGE, room=...)`. They reach subscribers exclusively via label routing.
+- **No auto-room-label.** The `meadows:room:<group_id>` label is not applied to RPC messages.
+- **Persisted.** Both request and response are stored in the group's JSONL file.
+- **Correlation.** The `request_id` in label metadata ties response to request. The caller's `call_rpc()` future resolves when a matching `RPC_RESPONSE` arrives.
+- **Deliver modes.** Service bots subscribe with `deliver="message_only"` to receive the full message content. The server loads the message from persistence and emits it as a `MESSAGE` event to the subscriber.
+
 ## Group events
 
 | Event | Direction | Auth | Description |
