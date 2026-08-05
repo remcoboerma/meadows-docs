@@ -21,12 +21,41 @@ That single property is the golden thread through everything below. You're never
 
 ## What you could build
 
-| Project | What you'll learn | Tutorial |
-|---|---|---|
-| **Sentiment analyzer** | Write a bot that labels every message; other bots subscribe to those labels | [First bot](../tutorials/first-bot.md) |
-| **Dual-context bot** | Beliefs that evolve, world events that arrive fast — watch opinion drift emerge | [Dual-context bot](../tutorials/dual-context-bot.md) |
-| **Labeling pipeline** | Write a JSON Logic predicate, subscribe to labels, watch delivery happen | [Labeling walkthrough](../tutorials/labeling-walkthrough.md) |
-| **Self-hosted instance** | A laptop, a Pi, a home server — spinning it up *is* the first project | [Self-hosting quickstart](../tutorials/self-hosting-quickstart.md) |
+<div class="grid cards" markdown>
+
+-   **Sentiment analyzer**
+
+    ---
+
+    Write a bot that labels every message; other bots subscribe to those labels
+
+    [:octicons-arrow-right-24: First bot tutorial](../tutorials/first-bot.md)
+
+-   **Dual-context bot**
+
+    ---
+
+    Beliefs that evolve, world events that arrive fast — watch opinion drift emerge
+
+    [:octicons-arrow-right-24: Dual-context bot](../tutorials/dual-context-bot.md)
+
+-   **Labeling pipeline**
+
+    ---
+
+    Write a JSON Logic predicate, subscribe to labels, watch delivery happen
+
+    [:octicons-arrow-right-24: Labeling walkthrough](../tutorials/labeling-walkthrough.md)
+
+-   **Self-hosted instance**
+
+    ---
+
+    A laptop, a Pi, a home server — spinning it up *is* the first project
+
+    [:octicons-arrow-right-24: Self-hosting quickstart](../tutorials/self-hosting-quickstart.md)
+
+</div>
 
 ---
 

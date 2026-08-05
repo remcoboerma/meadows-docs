@@ -33,6 +33,10 @@ An async method on `MeadowClient` (and `BaseBot`) that sends an `RPC_REQUEST` vi
 
 The single point through which every client-bound frame passes. `hub.emit_frame()` validates the frame against `meadows.protocol` before it hits the wire. Invalid frames raise `ValueError`. See [Design Principles](../architecture/design-principles.md#11-single-chokepoint-emit).
 
+### dual-context bot
+
+A compositional pattern: a bot with two layers — a *set of beliefs* and a stream of *world events* it responds to according to those beliefs. Beliefs evolve slowly; events arrive fast. This makes personal growth, opinion drift, and adaptation visible over time. See [Compositional patterns](../concepts/index.md#the-dual-context-bot).
+
 ### dumb coordinator
 
 The server distributes messages without claiming room ownership. It evaluates predicates, routes labels, persists records. It does not understand what labels *mean*. Meaning is domain; routing is protocol. See [Design Principles](../architecture/design-principles.md#3-dumb-coordinator-not-intelligent-router).
@@ -48,6 +52,10 @@ A concept borrowed from evolutionary biology: a trait that evolves for one purpo
 ### hub
 
 The `Hub` class in `meadows-server`. An object holding all mutable state — sessions, bots, groups, patterns, persistence — with explicit `start()`/`stop()`. No module-level `sio` or state. See [Server Package](../server/index.md).
+
+### interactional labeling
+
+Labeling that answers "what good practice just occurred?" — peer learning moments, scaffolding moves, metacognition. One half of the labeling split. Different studies, almost different disciplines. See [Interactional labeling](../concepts/index.md#interactional-labeling) for the full description.
 
 ### JSON Logic predicate
 
@@ -97,13 +105,13 @@ Dumb HTTP host serving `index.html` and static assets. No Socket.IO, no auth. Th
 
 The server acts as a message bus: every message in a group is visible to every participant — human or bot. Bots that subscribe to a room label receive the same messages that humans see. This is not request-response; it is a shared, persistent, multi-party context. The conversation *is* the architecture. See [Microservices, but for conversation](../architecture/overview.md#microservices-but-for-conversation).
 
-### persistence as a corpus
-
-Every conversation, every label, every session becomes durable, mineable material. Messages are stored as append-only JSONL. This year's hackathon can learn from last year's workshop. History becomes a resource, not exhaust. See [Persistence](../architecture/labeling.md#persistence).
-
 ### pattern matching
 
 Regex-based message interception. Flat — every bot gets what the regex finds, without context, without shared taxonomy. Coexists with [label subscriptions](#label-subscription) for simple content matching. Limited to 50 per bot. See [Patterns vs. label subscriptions](../architecture/labeling.md#patterns-vs-label-subscriptions).
+
+### persistence as a corpus
+
+Every conversation, every label, every session becomes durable, mineable material. Messages are stored as append-only JSONL. This year's hackathon can learn from last year's workshop. History becomes a resource, not exhaust. See [Persistence](../architecture/labeling.md#persistence).
 
 ### RPC via labels
 
@@ -111,11 +119,7 @@ Bot-to-bot communication using the same label-routing pipeline. An `RPC_REQUEST`
 
 ### semantic labeling
 
-Labeling that answers "what is this about?" — topic, sentiment, intent, domain classification. One half of the labeling split. See [interactional labeling](#interactional-labeling).
-
-### interactional labeling
-
-Labeling that answers "what good practice just occurred?" — peer learning moments, scaffolding moves, metacognition. The other half of the labeling split. Different studies, almost different disciplines. See [interactional labeling](../concepts/index.md#interactional-labeling).
+Labeling that answers "what is this about?" — topic, sentiment, intent, domain classification. The other half of the labeling split. See [interactional labeling](#interactional-labeling).
 
 ### single chokepoint emit
 
@@ -128,7 +132,3 @@ MEADOWS is a substrate, not a framework. It does not tell bots what to do. It pr
 ### trusted operator
 
 MEADOWS assumes a trusted server operator. This eliminates Byzantine-federation complexity (mutual-distrust axiom). The server routes; the operator decides who participates. Not on-by-default — a deliberate choice. See [Design Principles](../architecture/design-principles.md#2-trusted-operator-assumption).
-
-### dual-context bot
-
-A compositional pattern: a bot with two layers — a *set of beliefs* and a stream of *world events* it responds to according to those beliefs. Beliefs evolve slowly; events arrive fast. This makes personal growth, opinion drift, and adaptation visible over time. See [compositional patterns](../concepts/index.md#the-dual-context-bot).

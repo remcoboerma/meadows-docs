@@ -106,24 +106,29 @@ class BeliefBot(BaseBot):
 
 ## 2. React to world events
 
-Add an event handler that adjusts beliefs based on incoming messages:
+Add an event handler that adjusts beliefs based on incoming messages. Register it in `__init__`:
 
 ```python
+    def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
+        self.beliefs: dict[str, float] = self._load_beliefs()
+        from meadows.protocol import EventName
+        self.client.on(EventName.MESSAGE, self._on_world_event)
+
     def _on_world_event(self, data: dict[str, Any]) -> None:
         """React to messages by adjusting beliefs."""
         content = data.get("content", "").lower()
-        sender = data.get("bot_name") or data.get("user_id", "unknown")
+
+        # Skip bot's own messages
+        if data.get("bot_name") == self.BOT_NAME:
+            return
+        if not content:
+            return
 
         # Simple belief adjustment based on keywords
         adjustments = {
-            "ai": {
-                "positive": 0.05,   # "great", "amazing", "love"
-                "negative": -0.05,  # "terrible", "hate", "scary"
-            },
-            "privacy": {
-                "positive": 0.03,
-                "negative": -0.03,
-            },
+            "ai": {"positive": 0.05, "negative": -0.05},
+            "privacy": {"positive": 0.03, "negative": -0.03},
         }
 
         for topic, rules in adjustments.items():
@@ -176,7 +181,59 @@ The beliefs file (`belief_state.json`) persists across restarts. Leave the bot r
 
 ## Crossing with labeling
 
-The real power comes when you add [labels](../architecture/labeling.md). Emit a label like `("belief-bot", "opinion-shift", "1.0.0", {"topic": "ai", "delta": 0.05})` whenever a belief changes. Other bots can subscribe to opinion-shift labels and track how beliefs propagate through a group.
+The real power comes when you add [labels](../architecture/labeling.md). Emit a label whenever a belief changes, so other bots can track opinion drift:
+
+```python
+from meadows.protocol import Label
+
+    def _on_world_event(self, data: dict[str, Any]) -> None:
+        """React to messages by adjusting beliefs and emitting labels."""
+        content = data.get("content", "").lower()
+        msg_id = data.get("id", "")
+
+        if data.get("bot_name") == self.BOT_NAME:
+            return
+        if not content:
+            return
+
+        adjustments = {
+            "ai": {"positive": 0.05, "negative": -0.05},
+            "privacy": {"positive": 0.03, "negative": -0.03},
+        }
+
+        for topic, rules in adjustments.items():
+            old = self.beliefs.get(topic, 0.5)
+            if any(w in content for w in ["great", "amazing", "love", "good"]):
+                self.beliefs[topic] = min(1.0, old + rules["positive"])
+            elif any(w in content for w in ["terrible", "hate", "scary", "bad"]):
+                self.beliefs[topic] = max(0.0, old + rules["negative"])
+
+            delta = self.beliefs[topic] - old
+            if delta != 0:
+                label = Label("belief-bot", "opinion-shift", "1.0.0",
+                              {"topic": topic, "delta": round(delta, 2)})
+                self.emit_label(msg_id, [label])
+
+        self._save_beliefs()
+```
+
+Other bots can subscribe to opinion-shift labels:
+
+```python
+bot.register_label_subscription(
+    "opinion_watcher",
+    {
+        "and": [
+            {"regex_match": [{"var": "origin"}, "^belief-bot$"]},
+            {"regex_match": [{"var": "label"}, "^opinion-shift$"]},
+        ]
+    },
+    scope="global",
+    deliver="label_only",
+)
+```
+
+See the [labeling walkthrough](labeling-walkthrough.md) for the full pipeline.
 
 ## Next steps
 

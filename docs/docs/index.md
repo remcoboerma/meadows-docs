@@ -66,14 +66,57 @@ graph TD
 
 ## Quick links
 
-| I am a... | Start here |
-|---|---|
-| **Developer** — protocol, packages, API reference | [Architecture Overview](architecture/overview.md) |
-| **Educator** — classroom, workshop, bot authoring | [Learn in the Classroom](learn/classroom.md) |
-| **Student** — first bot, labeling, systems thinking | [First Bot Tutorial](tutorials/first-bot.md) |
-| **Hobbyist** — self-host, vibe code, tinker | [For the Hobbyist](learn/hobbyist.md) |
-| **Architect** — design principles, tradeoffs | [Design Principles](architecture/design-principles.md) |
-| **Researcher** — systems thinking, ML, emergence | [By Interest](learn/by-interest.md) |
+<div class="grid cards" markdown>
+
+-   :material-account:{ .lg .middle } **Developer**
+
+    ---
+
+    Protocol, packages, API reference, architecture.
+
+    [:octicons-arrow-right-24: Architecture Overview](architecture/overview.md)
+
+-   :material-school:{ .lg .middle } **Educator**
+
+    ---
+
+    Classroom activities, teacher workshops, bot authoring for non-engineers.
+
+    [:octicons-arrow-right-24: Learn in the Classroom](learn/classroom.md)
+
+-   :material-school:{ .lg .middle } **Student**
+
+    ---
+
+    First bot, labeling walkthrough, systems thinking.
+
+    [:octicons-arrow-right-24: First Bot Tutorial](tutorials/first-bot.md)
+
+-   :material-puzzle:{ .lg .middle } **Hobbyist**
+
+    ---
+
+    Self-host, vibe code, tinker, share.
+
+    [:octicons-arrow-right-24: For the Hobbyist](learn/hobbyist.md)
+
+-   :material-sitemap:{ .lg .middle } **Architect**
+
+    ---
+
+    Design principles, tradeoffs, decentralization spectrum.
+
+    [:octicons-arrow-right-24: Design Principles](architecture/design-principles.md)
+
+-   :material-brain:{ .lg .middle } **Researcher**
+
+    ---
+
+    Systems thinking, ML playground, emergence.
+
+    [:octicons-arrow-right-24: By Interest](learn/by-interest.md)
+
+</div>
 
 ## License
 
