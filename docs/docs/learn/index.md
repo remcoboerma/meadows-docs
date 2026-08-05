@@ -21,41 +21,12 @@ That single property is the golden thread through everything below. You're never
 
 ## What you could build
 
-<div class="grid cards" markdown>
-
--   **A sentiment analyzer** that labels every message and alerts on negativity
-
-    ---
-
-    Write a [bot](../tutorials/first-bot.md) that [produces labels](../architecture/labeling.md). Other bots subscribe to those labels. The server routes.
-
-    [:octicons-arrow-right-24: First bot tutorial](../tutorials/first-bot.md)
-
--   **A dual-context bot** with beliefs that evolve over time
-
-    ---
-
-    A bot with two layers: beliefs (slow) and world events (fast). Watch opinion drift, adaptation, and emergence become visible.
-
-    [:octicons-arrow-right-24: Dual-context tutorial](../tutorials/dual-context-bot.md)
-
--   **A labeling pipeline** where bots classify messages in real time
-
-    ---
-
-    Write a [JSON Logic predicate](../architecture/labeling.md#json-logic-predicates), subscribe to labels, watch delivery happen. Classification you can argue with.
-
-    [:octicons-arrow-right-24: Labeling walkthrough](../tutorials/labeling-walkthrough.md)
-
--   **A self-hosted instance** on your own hardware
-
-    ---
-
-    A laptop, a Raspberry Pi, a home server. Spinning up your own MEADOWS instance *is* the first project.
-
-    [:octicons-arrow-right-24: Self-hosting quickstart](../tutorials/self-hosting-quickstart.md)
-
-</div>
+| Project | What you'll learn | Tutorial |
+|---|---|---|
+| **Sentiment analyzer** | Write a bot that labels every message; other bots subscribe to those labels | [First bot](../tutorials/first-bot.md) |
+| **Dual-context bot** | Beliefs that evolve, world events that arrive fast — watch opinion drift emerge | [Dual-context bot](../tutorials/dual-context-bot.md) |
+| **Labeling pipeline** | Write a JSON Logic predicate, subscribe to labels, watch delivery happen | [Labeling walkthrough](../tutorials/labeling-walkthrough.md) |
+| **Self-hosted instance** | A laptop, a Pi, a home server — spinning it up *is* the first project | [Self-hosting quickstart](../tutorials/self-hosting-quickstart.md) |
 
 ---
 
