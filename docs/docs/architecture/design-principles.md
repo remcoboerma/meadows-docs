@@ -90,3 +90,71 @@ Label predicates are JSON Logic rules — boolean expressions over label data. J
 ## 17. The docent test
 
 Every piece of documentation, every SDK surface, every error message must pass the docent test: can a Dutch teacher (groep 6), together with an AI, use this to build a working bot without reading the source code? If the answer is no, the documentation is not done. Code examples must be copy-pasteable. Errors must be in human language. The quick-start must be truly quick.
+
+---
+
+## Architecture as deliberate tradeoff
+
+The principles above are not abstract ideals. Each one resolves a specific tension between competing goods. Naming the tradeoff is as important as making the choice.
+
+### Decentralization is a spectrum, not a switch
+
+Most people treat "centralized vs. decentralized" as a toggle. MEADOWS treats it as a set of independent axes, each tuned deliberately:
+
+| Axis | MEADOWS choice | What it centralizes | What it decentralizes |
+|------|----------------|---------------------|----------------------|
+| **Meaning** | Distributed labels, no central schema authority | — | Bots define their own label vocabularies; no registry, no approval gate |
+| **Governance** | Standards emerge by popularity, not decree | — | Which labels become de facto standard is decided by usage, not by a committee |
+| **Ownership of context** | Nobody solely owns the shared space | Coordination (one server per deployment) | The conversation belongs to all participants; the server routes but does not curate |
+| **Bot hosting** | Self-hosted, run anywhere | Trust (a trusted operator can read everything) | A bot is a process with a JWT; it can run on a laptop, a Pi, or a cloud function |
+| **Federation** | Capped — read-only replication, not bidirectional sync | Coordination topology | A second server can replicate a room's history; it cannot write back |
+
+The lesson is not "decentralize everything." Each axis has a tradeoff. Centralizing coordination gives you simplicity and low latency. Centralizing trust gives you an accountability model without Byzantine-fault complexity. Decentralizing meaning gives you emergence. Decentralizing hosting gives you resilience.
+
+The phrase that captures the whole design: **decentralized governance within a centralized coordination hub.**
+
+### Why dumb-coordinator beats smart-router
+
+A smart router would understand message semantics, make routing decisions based on content, and offer features like priority queues, content transformation, or AI-powered triage. This would make the server a *product* — and every bot would depend on its intelligence.
+
+The dumb coordinator does less, and that's the point. Because the server doesn't understand meaning:
+
+- Bots can invent new label vocabularies without server changes
+- A second server can be built that speaks the same protocol
+- Federation is trivial (replicate the log, not the intelligence)
+- The operator's trust boundary is clean (route, don't interpret)
+- No single AI vendor is baked into the infrastructure
+
+The tradeoff: bot authors must handle their own meaning-making. The platform provides routing; bots provide intelligence. This is the [substrate, not a framework](../concepts/glossary.md#substrate) principle in action.
+
+### Why RPC is labels, not a separate system
+
+An alternative would be a dedicated RPC channel with its own auth, its own routing, and its own protocol events. This would be more "powerful" — but also more complex, harder to debug, and opaque to other participants.
+
+By making RPC a label subscription with a `request_id` in metadata:
+
+- Any bot can observe RPC traffic by subscribing to the right labels
+- The same dedup, persistence, and cascade mechanisms apply
+- A GUI client can display "which bots are calling which services"
+- There is exactly one routing mechanism to learn
+
+The tradeoff: RPC is less flexible than a bespoke system. It cannot do streaming, bidirectional callbacks, or type-safe contracts. But it is transparent, composable, and simple — which matters more in a system where bots are written by non-engineers.
+
+### Why append-only
+
+Labels could be mutable. A bot could "correct" a sentiment score, or a governance label could be updated when consensus changes. This would be more "accurate" — but it would break the guarantee that a subscriber who saw a label can rely on it existing.
+
+Append-only means:
+
+- No depth limits or timeouts needed to prevent infinite cascades
+- Subscribers can trust that what they saw is what happened
+- The JSONL log is a faithful history, not a materialized view
+- Debugging is straightforward: what happened, happened
+
+The tradeoff: you accumulate stale labels. If a semver is wrong, you bump it rather than fix it. This is intentional — it trades storage simplicity for correctness guarantees.
+
+### Why the docent test is principle #17, not #1
+
+Every principle above serves the docent test. The dumb coordinator serves it (simpler mental model). The trusted operator serves it (no federation complexity). The append-only labels serve it (no surprising state). The docent test is not a separate concern — it is the *purpose* that the other principles serve.
+
+The order matters: principles 1–16 are the *how*. Principle 17 is the *why*.

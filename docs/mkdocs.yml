@@ -103,6 +103,21 @@ nav:
   - Getting Started:
       - Overview: getting-started.md
       - Installation: installation.md
+      - Tutorials:
+          - First Bot: tutorials/first-bot.md
+          - Dual-Context Bot: tutorials/dual-context-bot.md
+          - Labeling Walkthrough: tutorials/labeling-walkthrough.md
+          - Self-Hosting: tutorials/self-hosting-quickstart.md
+  - Learn:
+      - Overview: learn/index.md
+      - Classroom: learn/classroom.md
+      - Workshop: learn/workshop.md
+      - Hackathon: learn/hackathon.md
+      - Hobbyist: learn/hobbyist.md
+      - By Interest: learn/by-interest.md
+  - Concepts:
+      - Overview: concepts/index.md
+      - Glossary: concepts/glossary.md
   - Architecture:
       - Overview: architecture/overview.md
       - Dependency Graph: architecture/dependency-graph.md
